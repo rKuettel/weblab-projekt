@@ -1,12 +1,25 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
+import { Navigation } from './components/navigation/navigation';
+import { PATHS } from './config/paths.config';
 
 @Component({
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, Navigation],
   selector: 'app-root',
   styleUrl: './app.css',
-  templateUrl: './app.html',
+  template: `
+    <app-navigation [links]='getAvailableLinks()'></app-navigation>
+    <router-outlet />
+  `,
 })
 export class App {
-  protected readonly title = signal('track-thing');
+  private translate = inject(TranslateService);
+  constructor() {
+    this.translate.addLangs(['en']);
+  }
+
+  getAvailableLinks() {
+    return Object.values(PATHS);
+  }
 }
