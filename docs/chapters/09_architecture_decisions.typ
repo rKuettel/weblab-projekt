@@ -2,6 +2,30 @@
 #import "../lib.typ": arc42help
 = Architekturentscheidungen <section-design-decisions>
 
+
+== ADR 1: Backend- und Infrastruktur Ansatz
+
+Grundlegender Ansatz wie das Backend aufgebaut werden soll.
+
+=== Decision
+
+Das Backend wird als Monolith implementiert.
+Grund dafür ist, dass damit immer noch alle Qualitätsmerkmale erfüllt werden können und die Applikation relativ klein sein wird worurch ein andere Ansatz wie z.B. SCS nicht nötig ist.
+
+
+== ADR 2: Client Architekturansatz
+
+Die Entscheidung wie die der Client umgestezt wird.
+
+=== Decision
+
+Der Client wird als SPA umgesetzt.
+//TODO: link zu Anforderung sobald in docu
+Die Begründung dafür ist die "Could" Anforderung, dass man die Applikation auch ohne Internet Verbindung verwenden können soll.
+Dadruch fallen Optionen bei denen Server Side Rendering eingesetzt wird weg.
+
+
+
 #arc42help[
   *Inhalt*
 
