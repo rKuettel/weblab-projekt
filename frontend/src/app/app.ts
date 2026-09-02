@@ -9,8 +9,12 @@ import { PATHS } from './config/paths.config';
   selector: 'app-root',
   styleUrl: './app.css',
   template: `
-    <app-navigation [links]='getAvailableLinks()'></app-navigation>
-    <router-outlet />
+    <header>
+      <app-navigation appName="app.title" [links]="getAvailableLinks()"></app-navigation>
+    </header>
+    <main>
+      <router-outlet />
+    </main>
   `,
 })
 export class App {
