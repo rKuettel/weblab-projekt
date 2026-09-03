@@ -10,7 +10,7 @@ import { TranslatePipe } from '@ngx-translate/core';
     <nav>
       <ul>
         <li>
-          <strong>{{ this.appName() | translate }}</strong>
+          <strong data-testid="title">{{ title | translate }}</strong>
         </li>
       </ul>
       <ul>
@@ -28,6 +28,6 @@ import { TranslatePipe } from '@ngx-translate/core';
   styles: ``,
 })
 export class Navigation {
-  appName = input.required<string>();
+  title = 'app.name';
   links = input.required<NavigationItem[]>();
 }

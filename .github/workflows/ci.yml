@@ -1,0 +1,32 @@
+name: Angular CI
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - uses: pnpm/setup@v2.1.0
+        with:
+          runtime: node@24
+          cache: true
+          working-directory: frontend
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+        working-directory: frontend
+
+      - name: Test
+        run: pnpm test --watch=false
+        working-directory: frontend
+
+      - name: Build
+        run: pnpm build
+        working-directory: frontend
