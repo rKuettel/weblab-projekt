@@ -1,0 +1,14 @@
+services:
+  mongo:
+    image: mongo:7
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGODB_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_PASS}
+    ports:
+      - '27017:27017'
+  moguku:
+    image: huggingface/mongoku
+    environment:
+      MONGOKU_DEFAULT_HOST: 'mongodb://${MONGODB_USER}:${MONGODB_PASS}@mongo'
+    ports:
+      - '3100:3100'

@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { DEFAULT_TRACKER } from '../../tracker.types';
 import { TrackerCardComponent } from '../../dumb/tracker-card/tracker-card.component';
+import { TrackerApi } from '../../services/api/tracker.api';
 
 @Component({
   imports: [TrackerCardComponent],
@@ -24,19 +25,20 @@ import { TrackerCardComponent } from '../../dumb/tracker-card/tracker-card.compo
   `,
   template: `
     <div class="grid dashboard">
-      @for (tracker of this.trackers; track $index) {
+      @for (tracker of this.trackers.value(); track $index) {
         <app-tracker-card [tracker]="tracker"></app-tracker-card>
       }
-      <button class="outline">Add New Tracker</button>
+      <button (click)="this.addTracker()" class="outline">Add New Tracker</button>
     </div>
   `,
 })
 export class TrackerDashboardComponent {
-  public trackers = [
-    { ...DEFAULT_TRACKER },
-    { ...DEFAULT_TRACKER },
-    { ...DEFAULT_TRACKER },
-    { ...DEFAULT_TRACKER },
-    { ...DEFAULT_TRACKER },
-  ];
+  private api = inject(TrackerApi);
+  public trackers = this.api.getTrackers();
+
+  addTracker() {
+    this.api
+      .createTracker(DEFAULT_TRACKER)
+      .subscribe((t) => this.trackers.update((trackers) => [...trackers, t]));
+  }
 }
