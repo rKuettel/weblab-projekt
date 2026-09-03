@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { Navigation } from './navigation';
+import { NavigationComponent } from './navigation.component';
 import { NavigationItem } from './navigation.type';
 import { provideTranslateService, TranslateService } from '@ngx-translate/core';
 import { inputBinding, signal } from '@angular/core';
@@ -31,19 +31,19 @@ async function setup(props: Partial<Props> = {}) {
   const mergedProps = { ...defaultProps, ...props };
 
   await TestBed.configureTestingModule({
-    imports: [Navigation, RouterLink, RouterLinkActive],
+    imports: [NavigationComponent, RouterLink, RouterLinkActive],
     providers: [
       provideTranslateService({ fallbackLang: 'en' }),
       { provide: ActivatedRoute, useValue: {} },
     ],
   }).compileComponents();
 
-  const fixture = TestBed.createComponent(Navigation, {
+  const fixture = TestBed.createComponent(NavigationComponent, {
     bindings: [inputBinding('links', signal(mergedProps.links))],
   });
   const translate = TestBed.inject(TranslateService);
   translate.setTranslation('en', {
-    app: { name: 'Title' },
+    app: { title: 'Title' },
   });
   const component = fixture.componentInstance;
   fixture.detectChanges();

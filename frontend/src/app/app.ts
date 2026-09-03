@@ -1,11 +1,11 @@
 import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { Navigation } from './components/navigation/navigation';
+import { NavigationComponent } from './components/navigation/navigation.component';
 import { PATHS } from './config/paths.config';
 
 @Component({
-  imports: [RouterOutlet, Navigation],
+  imports: [RouterOutlet, NavigationComponent],
   selector: 'app-root',
   styleUrl: './app.css',
   template: `
