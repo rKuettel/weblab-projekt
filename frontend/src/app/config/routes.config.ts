@@ -1,17 +1,16 @@
 import { Route } from '@angular/router';
 import { PATHS } from './paths.config';
-import { TrackerDashboard } from '../features/trackers/smart/tracker-dashboard/tracker-dashboard';
+import { TrackerDashboardComponent } from '../features/trackers/smart/tracker-dashboard/tracker-dashboard.component';
 
 const { HOME } = PATHS;
-
 
 export const routes: Route[] = [
   {
     path: HOME.path,
-    component: TrackerDashboard
+    component: TrackerDashboardComponent,
   },
   {
     path: '**',
-    redirectTo: HOME.path
-  }
-]
+    redirectTo: HOME.path,
+  },
+];
