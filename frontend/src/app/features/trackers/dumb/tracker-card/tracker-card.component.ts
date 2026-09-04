@@ -13,9 +13,7 @@ import { ButtonComponent } from '../../../../components/button/button.component'
       </header>
       <p>test</p>
       <footer class="grid">
-        <!-- <button>View</button> -->
-        <!-- <button class="secondary">Add Event</button> -->
-        <app-button class="container" text="View"></app-button>
+        <app-button text="View"></app-button>
         <app-button variant="secondary" text="Add Event"></app-button>
       </footer>
     </article>

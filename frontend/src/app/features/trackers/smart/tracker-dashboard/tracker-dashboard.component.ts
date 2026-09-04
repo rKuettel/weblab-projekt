@@ -1,10 +1,11 @@
 import { Component, inject } from '@angular/core';
-import { DEFAULT_TRACKER } from '../../tracker.types';
+import { CreateTracker } from '../../tracker.types';
 import { TrackerCardComponent } from '../../dumb/tracker-card/tracker-card.component';
 import { TrackerApi } from '../../services/api/tracker.api';
+import { TrackerFormComponent } from '../../dumb/tracker-form/tracker-form.component';
 
 @Component({
-  imports: [TrackerCardComponent],
+  imports: [TrackerCardComponent, TrackerFormComponent],
   selector: 'app-tracker-dashboard',
   styles: `
     .dashboard {
@@ -28,7 +29,10 @@ import { TrackerApi } from '../../services/api/tracker.api';
       @for (tracker of this.trackers.value(); track $index) {
         <app-tracker-card [tracker]="tracker"></app-tracker-card>
       }
-      <button (click)="this.addTracker()" class="outline">Add New Tracker</button>
+      <article>
+        <header><h3>Add New Tracker</h3></header>
+        <app-tracker-form (onFormSubmit)="addTracker($event)"></app-tracker-form>
+      </article>
     </div>
   `,
 })
@@ -36,9 +40,10 @@ export class TrackerDashboardComponent {
   private api = inject(TrackerApi);
   public trackers = this.api.getTrackers();
 
-  addTracker() {
+  addTracker(tracker: CreateTracker) {
+    console.log('Creating new Tracker: ', tracker);
     this.api
-      .createTracker(DEFAULT_TRACKER)
+      .createTracker(tracker)
       .subscribe((t) => this.trackers.update((trackers) => [...trackers, t]));
   }
 }

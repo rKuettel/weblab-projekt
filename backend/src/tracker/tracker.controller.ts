@@ -1,7 +1,17 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { TrackerService } from './tracker.service.js';
 import { CreateTrackerDto } from './dto/create-tracker.dto.js';
 import { UpdateTrackerDto } from './dto/update-tracker.dto.js';
+import { TrackerDto } from './dto/tracker.dto.js';
+import { toDto } from './dto/tracker.mapper.js';
 
 @Controller('tracker')
 export class TrackerController {
@@ -13,8 +23,10 @@ export class TrackerController {
   }
 
   @Get()
-  findAll() {
-    return this.trackerService.findAll();
+  async findAll(): Promise<TrackerDto[]> {
+    const trackers = await this.trackerService.findAll();
+
+    return trackers.map(toDto);
   }
 
   @Get(':id')

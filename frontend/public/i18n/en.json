@@ -4,5 +4,17 @@
   },
   "nav": {
     "home": "Home"
+  },
+  "tracker": {
+    "form": {
+      "name": "Name",
+      "type": "Type"
+    }
+  },
+  "validation": {
+    "required": "{{ field }} is required"
+  },
+  "button": {
+    "submit": "Submit"
   }
 }

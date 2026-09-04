@@ -12,7 +12,6 @@ export type ButtonType = 'button' | 'submit' | 'reset';
     }
     button {
       width: 100%;
-      /* padding: 0; */
       margin: 0;
     }
   `,

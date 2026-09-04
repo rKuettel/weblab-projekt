@@ -1,15 +1,14 @@
 export interface Tracker {
+  id: string;
   name: string;
   type: TrackerType;
-  summary: TrackerSummary;
 }
 
-export const DEFAULT_TRACKER: Tracker = {
-  name: 'Jaha',
+export type CreateTracker = Omit<Tracker, 'id' | 'summary'>;
+
+export const DEFAULT_TRACKER: CreateTracker = {
+  name: '',
   type: 'counter',
-  summary: {
-    totalCount: 0,
-  },
 };
 
 export const TRACKER_TYPES = {

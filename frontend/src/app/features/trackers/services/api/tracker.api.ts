@@ -1,7 +1,7 @@
 import { inject, Service } from '@angular/core';
 import { environment } from '../../../../environments/environment';
 import { HttpClient, httpResource } from '@angular/common/http';
-import { Tracker } from '../../tracker.types';
+import { CreateTracker, Tracker } from '../../tracker.types';
 import { Observable } from 'rxjs';
 
 @Service()
@@ -13,7 +13,7 @@ export class TrackerApi {
     return httpResource<Tracker[]>(() => this.apiUrl, { defaultValue: [] });
   }
 
-  public createTracker(newTracker: Tracker): Observable<Tracker> {
+  public createTracker(newTracker: CreateTracker): Observable<Tracker> {
     return this.http.post<Tracker>(this.apiUrl, newTracker);
   }
 }
