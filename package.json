@@ -1,0 +1,5 @@
+{
+  "scripts": {
+    "start": "pnpm --parallel --filter track-thing --filter track-thing-api start"
+  }
+}

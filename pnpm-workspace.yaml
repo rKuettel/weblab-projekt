@@ -1,0 +1,9 @@
+packages:
+  - "frontend"
+  - "backend"
+injectWorkspacePackages: true
+allowBuilds:
+  "@parcel/watcher": true
+  esbuild: true
+  lmdb: true
+  msgpackr-extract: true

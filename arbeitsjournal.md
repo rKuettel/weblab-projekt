@@ -6,3 +6,4 @@
 | 3. Sept | 1h      | Aufsetzen einfacher CI Pipeline               |
 | 3. Sept | 2h      | Erstellen der ersten Angular Componenten      |
 | 3. Sept | 3h      | Aufsetzen des Backends und Vertikaler Schnitt |
+| 4. Sept | 3h      | Docker Compose mit prod builds aufsetzen      |
