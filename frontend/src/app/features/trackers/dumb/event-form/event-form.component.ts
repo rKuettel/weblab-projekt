@@ -22,6 +22,7 @@ import { timestamp } from 'rxjs';
 
       <app-button
         [text]="'button.submit' | translate"
+        [fullWidth]="true"
         variant="primary"
         type="submit"
         [disabled]="!eventForm().valid()"

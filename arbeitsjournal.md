@@ -9,3 +9,4 @@
 | 4. Sept | 3h      | Docker Compose mit prod builds aufsetzen                    |
 | 4. Sept | 2h      | Formular zur erstellung von Trackern erstellt               |
 | 6. Sept | 3h      | Erste implementation um an Trackern Ereignisse hinzuzufügen |
+| 6. Sept | 2.5h    | Dialog Komponente entwickelt und auf formulare angewendet   |

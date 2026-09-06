@@ -18,8 +18,9 @@ export class TrackerController {
   constructor(private readonly trackerService: TrackerService) {}
 
   @Post()
-  create(@Body() createTrackerDto: CreateTrackerDto) {
-    return this.trackerService.create(createTrackerDto);
+  async create(@Body() createTrackerDto: CreateTrackerDto) {
+    const tracker = await this.trackerService.create(createTrackerDto);
+    return toDto(tracker);
   }
 
   @Get()

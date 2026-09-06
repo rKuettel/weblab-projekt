@@ -34,6 +34,7 @@ import { requiredTrimmed } from '../../../../services/requiredTrimmed.validator'
 
       <app-button
         [text]="'button.submit' | translate"
+        [fullWidth]="true"
         variant="primary"
         type="submit"
         [disabled]="!trackerForm().valid()"

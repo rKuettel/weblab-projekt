@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { CreateTracker, Tracker } from '../../tracker.types';
 import { TrackerCardComponent } from '../../dumb/tracker-card/tracker-card.component';
 import { TrackerApi } from '../../services/api/tracker.api';
@@ -6,11 +6,32 @@ import { TrackerFormComponent } from '../../dumb/tracker-form/tracker-form.compo
 import { EventFormComponent } from '../../dumb/event-form/event-form.component';
 import { EventApi } from '../../services/api/event.api';
 import { CreateTrackerEvent } from '../../events.types';
+import { ButtonComponent } from '../../../../components/button/button.component';
+import { DialogComponent } from '../../../../components/dialog/dialog.component';
+import { translate, TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 @Component({
-  imports: [TrackerCardComponent, TrackerFormComponent, EventFormComponent],
+  imports: [
+    TrackerCardComponent,
+    TrackerFormComponent,
+    EventFormComponent,
+    ButtonComponent,
+    DialogComponent,
+    TranslatePipe,
+  ],
   selector: 'app-tracker-dashboard',
   styles: `
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .header h2 {
+      margin-bottom: 0;
+    }
+
     .dashboard {
       display: grid;
       grid-template-columns: 1fr;
@@ -29,6 +50,13 @@ import { CreateTrackerEvent } from '../../events.types';
     }
   `,
   template: `
+    <div class="header">
+      <h2>Trackers</h2>
+      <app-button
+        [text]="'tracker.add' | translate"
+        (clicked)="this.isAddTrackerModalOpen.set(true)"
+      ></app-button>
+    </div>
     <div class="dashboard">
       @for (tracker of this.trackers.value(); track tracker.id) {
         <app-tracker-card
@@ -36,19 +64,22 @@ import { CreateTrackerEvent } from '../../events.types';
           (onAddEventClick)="changeCurrentTracker(tracker)"
         ></app-tracker-card>
       }
-      <article>
-        <header><h3>Add New Tracker</h3></header>
-        <app-tracker-form (onFormSubmit)="addTracker($event)"></app-tracker-form>
-      </article>
 
-      @if (this.currentTracker()) {
-        <article>
-          <header>
-            <h3>Add Event for '{{ this.currentTracker()!.name }}'</h3>
-          </header>
-          <app-event-form (onFormSubmit)="addEvent($event)"></app-event-form>
-        </article>
-      }
+      <app-dialog
+        [title]="'tracker.add' | translate"
+        [open]="isAddTrackerModalOpen()"
+        (onClose)="isAddTrackerModalOpen.set(false)"
+      >
+        <app-tracker-form (onFormSubmit)="addTracker($event)"></app-tracker-form>
+      </app-dialog>
+
+      <app-dialog
+        [title]="addEventModalTitle()"
+        [open]="isAddEventModalOpen()"
+        (onClose)="this.currentTracker.set(undefined)"
+      >
+        <app-event-form (onFormSubmit)="addEvent($event)"></app-event-form>
+      </app-dialog>
     </div>
   `,
 })
@@ -58,11 +89,22 @@ export class TrackerDashboardComponent {
   public trackers = this.api.getTrackers();
   public currentTracker = signal<Tracker | undefined>(undefined);
 
+  public isAddTrackerModalOpen = signal(false);
+  public isAddEventModalOpen = computed<boolean>(() => !!this.currentTracker());
+
+  public addEventTranslated = translate('event.add');
+  public addEventModalTitle = computed<string>(() => {
+    const currentTracker = this.currentTracker()?.name ?? '';
+    return `${this.addEventTranslated()}: ${currentTracker}`;
+  });
+
   addTracker(tracker: CreateTracker) {
     console.log('Creating new Tracker: ', tracker);
     this.api
       .createTracker(tracker)
       .subscribe((t) => this.trackers.update((trackers) => [...trackers, t]));
+
+    this.isAddTrackerModalOpen.set(false);
   }
 
   addEvent(event: CreateTrackerEvent) {
@@ -77,6 +119,7 @@ export class TrackerDashboardComponent {
           ),
         );
     }
+    this.currentTracker.set(undefined);
   }
 
   changeCurrentTracker(event: Tracker) {

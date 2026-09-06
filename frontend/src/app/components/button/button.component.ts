@@ -1,4 +1,4 @@
-import { Component, computed, input, output } from '@angular/core';
+import { Component, computed, HostBinding, input, output } from '@angular/core';
 
 export type ButtonVariant = 'primary' | 'secondary';
 export type ButtonType = 'button' | 'submit' | 'reset';
@@ -8,17 +8,21 @@ export type ButtonType = 'button' | 'submit' | 'reset';
   styles: `
     :host {
       display: inline-block;
-      width: 100%;
+      width: fit-content;
     }
     button {
-      width: 100%;
       margin: 0;
+    }
+    .full-width {
+      width: 100%;
     }
   `,
   template: `
     <button
       [type]="type()"
-      [class]="styleClasses()"
+      [class.full-width]="fullWidth()"
+      [class.outline]="outlined()"
+      [class]="variant()"
       [disabled]="disabled()"
       [attr.aria-label]="ariaLabel()"
       (click)="clicked.emit()"
@@ -31,12 +35,16 @@ export class ButtonComponent {
   readonly text = input.required<string>();
   readonly variant = input<ButtonVariant>('primary');
   readonly outlined = input<boolean>(false);
-  readonly outlinedClass = computed(() => (this.outlined() ? 'outlined' : ''));
-  readonly styleClasses = computed(() => `${this.variant()}  ${this.outlined() ? 'outlined' : ''}`);
+  readonly fullWidth = input<boolean>(false);
 
   readonly type = input<ButtonType>('button');
   readonly disabled = input(false);
   readonly ariaLabel = input<string>();
 
   readonly clicked = output<void>();
+
+  @HostBinding('style.width')
+  get width() {
+    return this.fullWidth() ? '100%' : 'fit-content';
+  }
 }
