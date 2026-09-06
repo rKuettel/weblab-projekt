@@ -9,6 +9,8 @@ export class Tracker {
   name: string;
   @Prop()
   type: string;
+  @Prop()
+  summary: number;
 }
 
 export const TrackerSchema = SchemaFactory.createForClass(Tracker);

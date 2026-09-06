@@ -1,7 +1,7 @@
 import { Component, computed, output, signal } from '@angular/core';
 import { form, FormField, required } from '@angular/forms/signals';
 import { CreateTracker, DEFAULT_TRACKER, TRACKER_TYPES } from '../../tracker.types';
-import { InputComponent } from '../../../../components/input-field-error/input-field-error';
+import { InputComponent } from '../../../../components/input/input.component';
 import { TitleCasePipe } from '@angular/common';
 import { ButtonComponent } from '../../../../components/button/button.component';
 import { translate, TranslatePipe } from '@ngx-translate/core';

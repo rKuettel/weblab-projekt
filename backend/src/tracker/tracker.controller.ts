@@ -31,7 +31,7 @@ export class TrackerController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.trackerService.findOne(+id);
+    return this.trackerService.findOne(id);
   }
 
   @Patch(':id')

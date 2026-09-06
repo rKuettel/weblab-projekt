@@ -28,5 +28,4 @@ export class InputComponent<T extends string | number> {
   readonly label = input.required<string>();
   readonly type = input.required<string>();
   readonly formField = input.required<Field<T>>();
-  // [ariaInvalid]="formField()().invalid()"
 }

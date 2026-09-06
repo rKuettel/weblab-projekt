@@ -20,8 +20,8 @@ export class TrackerService {
     return this.trackerModel.find().exec();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} tracker`;
+  findOne(id: string) {
+    return this.trackerModel.findById(id).exec();
   }
 
   update(id: number, updateTrackerDto: UpdateTrackerDto) {

@@ -2,6 +2,7 @@ export interface Tracker {
   id: string;
   name: string;
   type: TrackerType;
+  summary: number;
 }
 
 export type CreateTracker = Omit<Tracker, 'id' | 'summary'>;
