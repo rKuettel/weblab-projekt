@@ -11,4 +11,5 @@
 | 6. Sept   | 3h      | Erste implementation um an Trackern Ereignisse hinzuzufügen |
 | 6. Sept   | 2.5h    | Dialog Komponente entwickelt und auf formulare angewendet   |
 | 7. Sept   | 3h      | Erstellung der Tracker Detail Seite                         |
-| **Total** | 23.5h   |                                                             |
+| 7. Sept   | 4.5h    | Erste implementation einer Calendar Heat Map                |
+| **Total** | 28h     |                                                             |

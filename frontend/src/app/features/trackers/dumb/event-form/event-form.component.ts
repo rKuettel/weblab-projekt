@@ -4,7 +4,6 @@ import { form, FormField } from '@angular/forms/signals';
 import { InputComponent } from '../../../../components/input/input.component';
 import { ButtonComponent } from '../../../../components/button/button.component';
 import { TranslatePipe } from '@ngx-translate/core';
-import { timestamp } from 'rxjs';
 
 @Component({
   imports: [InputComponent, ButtonComponent, FormField, TranslatePipe],
@@ -45,14 +44,14 @@ export class EventFormComponent {
     if (eventForm.valid()) {
       console.log('emitting');
 
-      this.onFormSubmit.emit(this.toCreate(eventForm.value()));
+      this.onFormSubmit.emit(this.toModel(eventForm.value()));
       this.eventForm().reset({
         ...DEFAULT_TRACKEREVENT,
       });
     }
   }
 
-  toCreate(model: EventFormModel): CreateTrackerEvent {
+  toModel(model: EventFormModel): CreateTrackerEvent {
     const test: Date = new Date(model.timestamp);
 
     return {
@@ -80,7 +79,7 @@ function currentDateTime(): string {
   const now = new Date();
   const year = now.getFullYear();
   const month = String(now.getMonth() + 1).padStart(2, '0');
-  const day = String(now.getDay() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
   const hour = String(now.getHours()).padStart(2, '0');
   const minutes = String(now.getMinutes()).padStart(2, '0');
 

@@ -4,6 +4,14 @@ import { Component, computed, input } from '@angular/core';
   imports: [],
   selector: 'app-tracker-summary',
   styles: `
+    :host {
+      container-type: inline-size;
+      height: 100%;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
     .summary {
       /* Using Mono-Space Fonts defined in picocss: https://github.com/picocss/pico/blob/main/css/pico.jade.css */
       font-family:

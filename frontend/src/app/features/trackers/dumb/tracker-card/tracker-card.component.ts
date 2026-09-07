@@ -50,9 +50,7 @@ import { TrackerSummaryComponent } from '../tracker-summary/tracker-summary.comp
   template: `
     <div class="card">
       <h3>{{ tracker().name }}</h3>
-      <div class="content">
-        <app-tracker-summary [summary]="tracker().summary"></app-tracker-summary>
-      </div>
+      <app-tracker-summary [summary]="tracker().summary"></app-tracker-summary>
       <div class="footer">
         <app-button
           [fullWidth]="true"

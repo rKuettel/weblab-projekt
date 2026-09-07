@@ -2,7 +2,7 @@ import { IsDateString } from 'class-validator';
 
 export class EventQueryDto {
   @IsDateString()
-  from?: string;
+  from?: Date;
   @IsDateString()
-  to?: string;
+  to?: Date;
 }

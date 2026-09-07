@@ -42,11 +42,6 @@ export class EventController {
     return this.eventService.findInRange(trackerId, from, to);
   }
 
-  // @Get()
-  // findAll(@Param('trackerId') trackerId: string) {
-  //   return this.eventService.findAll(trackerId);
-  // }
-
   @Patch(':id')
   update(
     @Param('trackerId') trackerId: string,

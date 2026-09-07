@@ -22,5 +22,10 @@
   },
   "event": {
     "add": "Add Event"
+  },
+  "dateRangeSelector": {
+    "from": "Start Date",
+    "to": "End Date",
+    "invalidDateRange": "End date must be after start date"
   }
 }

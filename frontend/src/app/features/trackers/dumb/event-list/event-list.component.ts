@@ -11,7 +11,10 @@ import { ButtonComponent } from '../../../../components/button/button.component'
     }
   `,
   template: `
-    @for (event of this.events(); track event.id) {
+    @for (
+      event of this.events().sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+      track event.id
+    ) {
       <div>
         <p>Timestamp: {{ event.timestamp }}</p>
         <p>Data: {{ event.data.delta }}</p>

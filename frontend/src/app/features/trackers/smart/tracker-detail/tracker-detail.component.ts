@@ -10,11 +10,16 @@ import {
   DateRange,
   DateRangeSelectorComponent,
   daysAgo,
-  toDateString,
 } from '../../../../components/date-range-selector/date-range-selector.component';
+import { CalendarHeatmapComponent } from '../../../../components/calendar-heatmap/calendar-heatmap.component';
 
 @Component({
-  imports: [EventListComponent, DateRangeSelectorComponent, TrackerSummaryComponent],
+  imports: [
+    EventListComponent,
+    DateRangeSelectorComponent,
+    TrackerSummaryComponent,
+    CalendarHeatmapComponent,
+  ],
   selector: 'app-tracker-detail',
   styles: `
     .header {
@@ -30,39 +35,81 @@ import {
 
     .content {
       display: grid;
-      grid-template-columns: 1fr;
+      grid-template-columns: 1fr 3fr;
       gap: 1rem;
     }
 
-    @media screen and (min-width: 768px) {
-      .content {
-        grid-template-columns: repeat(2, 1fr);
-      }
+    .events {
+      min-width: 20rem;
     }
-    @media only screen and (min-width: 1024px) {
-      .content {
-        grid-template-columns: repeat(3, 1fr);
-      }
+
+    .stats {
+      display: grid;
+      gap: 1rem;
+      grid-template-columns: 1fr 1fr;
+      align-items: start;
+      align-content: start;
     }
+
+    .heatmap {
+      grid-column: span 2;
+    }
+
+    /* @media screen and (min-width: 768px) { */
+    /*   .content { */
+    /*     grid-template-columns: repeat(2, 1fr); */
+    /*   } */
+    /* } */
+    /* @media only screen and (min-width: 1024px) { */
+    /*   .content { */
+    /*     grid-template-columns: repeat(3, 1fr); */
+    /*   } */
+    /* } */
   `,
   template: `
     <div class="header">
       <h2>Trackers</h2>
-      <app-date-range-selector [(dateRange)]="this.dateRange"></app-date-range-selector>
+      <app-date-range-selector
+        (changed)="dateRangeChanged.set($event)"
+        [dateRange]="this.dateRange()"
+      >
+      </app-date-range-selector>
     </div>
     <div class="content">
       @if (this.trackerEvents.hasValue()) {
-        <article [aria-busy]="this.trackerEvents.isLoading()">
+        <article class="events" [aria-busy]="this.trackerEvents.isLoading()">
           <h3>Events</h3>
 
           <app-event-list [events]="trackerEvents.value()"></app-event-list>
         </article>
       }
-      <article [aria-busy]="this.tracker.isLoading()">
-        @if (this.tracker.hasValue()) {
-          <app-tracker-summary [summary]="this.tracker.value().summary"></app-tracker-summary>
-        }
-      </article>
+
+      <div class="stats">
+        <article [aria-busy]="this.tracker.isLoading()">
+          <h3>Total</h3>
+          @if (this.trackerEvents.hasValue()) {
+            <app-tracker-summary
+              [summary]="this.trackerEvents.value().reduce((acc, e) => (acc += e.data.delta), 0)"
+            ></app-tracker-summary>
+          }
+        </article>
+        <article [aria-busy]="this.tracker.isLoading()">
+          <h3>Avg Per Day</h3>
+          @if (this.trackerEvents.hasValue()) {
+            <app-tracker-summary
+              [summary]="this.trackerEvents.value().reduce((acc, e) => (acc += e.data.delta), 0)"
+            ></app-tracker-summary>
+          }
+        </article>
+        <article class="heatmap" [aria-busy]="this.trackerEvents.isLoading()">
+          @if (this.heatMapData()) {
+            <h3>Heatmap</h3>
+            <app-calendar-heatmap [data]="this.heatMapData()" [dateRange]="this.dateRangeChanged()">
+              ></app-calendar-heatmap
+            >
+          }
+        </article>
+      </div>
     </div>
   `,
 })
@@ -71,13 +118,55 @@ export class TrackerDetailComponent {
   readonly trackerId = signal(this.activatedRoute.snapshot.params['id']);
 
   public dateRange = signal<DateRange>({
-    from: toDateString(daysAgo(7)),
-    to: toDateString(new Date()),
+    from: daysAgo(7),
+    to: new Date(),
   });
+
+  public dateRangeChanged = signal<DateRange>({
+    ...this.dateRange(),
+  });
+
+  private dateRangeTransformed = computed(() => {
+    const date = this.dateRangeChanged();
+    const to = date.to;
+    if (to) {
+      to.setHours(23, 59, 59);
+    }
+    return {
+      from: date.from,
+      to: to,
+    };
+  });
+
   private api = inject(TrackerApi);
   private eventApi = inject(EventApi);
   public tracker = this.api.getTracker(this.trackerId);
-  public trackerEvents = this.eventApi.getTrackerEvents(this.trackerId, this.dateRange);
+  public trackerEvents = this.eventApi.getTrackerEvents(this.trackerId, this.dateRangeTransformed);
+
+  public heatMapData = computed(() => {
+    const events = this.trackerEvents.value();
+    const grouped = events?.reduce(
+      (acc, event) => {
+        const date = event.timestamp.toISOString().split('T')[0];
+        if (!acc[date]) {
+          acc[date] = event.data.delta;
+        } else {
+          acc[date] += event.data.delta;
+        }
+        return acc;
+      },
+      {} as Record<string, number>,
+    );
+    if (!grouped) {
+      return [];
+    }
+    return Object.entries(grouped).map(([date, sum]) => {
+      return {
+        date: new Date(date),
+        value: sum,
+      };
+    });
+  });
 
   constructor() {
     this.activatedRoute.params.subscribe((params) => {
