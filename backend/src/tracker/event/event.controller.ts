@@ -6,12 +6,14 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { EventService } from './event.service.js';
 import { CreateEventDto } from './dto/create-event.dto.js';
 import { UpdateEventDto } from './dto/update-event.dto.js';
 import { TrackerDto } from '../dto/tracker.dto.js';
 import { toDto } from '../dto/tracker.mapper.js';
+import { EventQueryDto } from './dto/event-query.dto.js';
 
 @Controller('tracker/:trackerId/event')
 export class EventController {
@@ -30,9 +32,20 @@ export class EventController {
   }
 
   @Get()
-  findAll(@Param('trackerId') trackerId: string) {
-    return this.eventService.findAll(trackerId);
+  findInRange(
+    @Param('trackerId') trackerId: string,
+    @Query() query: EventQueryDto,
+  ) {
+    const from = query.from ? new Date(query.from) : undefined;
+    const to = query.to ? new Date(query.to) : undefined;
+
+    return this.eventService.findInRange(trackerId, from, to);
   }
+
+  // @Get()
+  // findAll(@Param('trackerId') trackerId: string) {
+  //   return this.eventService.findAll(trackerId);
+  // }
 
   @Patch(':id')
   update(

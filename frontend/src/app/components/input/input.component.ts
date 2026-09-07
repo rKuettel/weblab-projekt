@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { Field, FormField } from '@angular/forms/signals';
 
 @Component({
@@ -11,6 +11,7 @@ import { Field, FormField } from '@angular/forms/signals';
         [type]="this.type()"
         [formField]="this.formField()"
         [ariaInvalid]="formField()().invalid()"
+        (change)="change.emit()"
       />
       @for (error of formField()().errors(); track error) {
         <small>{{ error.message }}</small>
@@ -28,4 +29,6 @@ export class InputComponent<T extends string | number> {
   readonly label = input.required<string>();
   readonly type = input.required<string>();
   readonly formField = input.required<Field<T>>();
+
+  readonly change = output<void>();
 }

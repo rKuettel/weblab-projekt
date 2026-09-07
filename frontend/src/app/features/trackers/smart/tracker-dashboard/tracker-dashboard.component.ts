@@ -8,7 +8,7 @@ import { EventApi } from '../../services/api/event.api';
 import { CreateTrackerEvent } from '../../events.types';
 import { ButtonComponent } from '../../../../components/button/button.component';
 import { DialogComponent } from '../../../../components/dialog/dialog.component';
-import { translate, TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { translate, TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   imports: [
@@ -50,36 +50,41 @@ import { translate, TranslatePipe, TranslateService } from '@ngx-translate/core'
     }
   `,
   template: `
-    <div class="header">
-      <h2>Trackers</h2>
-      <app-button
-        [text]="'tracker.add' | translate"
-        (clicked)="this.isAddTrackerModalOpen.set(true)"
-      ></app-button>
-    </div>
-    <div class="dashboard">
-      @for (tracker of this.trackers.value(); track tracker.id) {
-        <app-tracker-card
-          [tracker]="tracker"
-          (onAddEventClick)="changeCurrentTracker(tracker)"
-        ></app-tracker-card>
-      }
+    <div
+      [class.modal-is-opening]="isAddEventModalOpen() || isAddTrackerModalOpen()"
+      [class.modal-is-open]="isAddEventModalOpen() || isAddTrackerModalOpen()"
+    >
+      <div class="header">
+        <h2>Trackers</h2>
+        <app-button
+          [text]="'tracker.add' | translate"
+          (clicked)="this.isAddTrackerModalOpen.set(true)"
+        ></app-button>
+      </div>
+      <div class="dashboard">
+        @for (tracker of this.trackers.value(); track tracker.id) {
+          <app-tracker-card
+            [tracker]="tracker"
+            (onAddEventClick)="changeCurrentTracker(tracker)"
+          ></app-tracker-card>
+        }
 
-      <app-dialog
-        [title]="'tracker.add' | translate"
-        [open]="isAddTrackerModalOpen()"
-        (onClose)="isAddTrackerModalOpen.set(false)"
-      >
-        <app-tracker-form (onFormSubmit)="addTracker($event)"></app-tracker-form>
-      </app-dialog>
+        <app-dialog
+          [title]="'tracker.add' | translate"
+          [open]="isAddTrackerModalOpen()"
+          (onClose)="isAddTrackerModalOpen.set(false)"
+        >
+          <app-tracker-form (onFormSubmit)="addTracker($event)"></app-tracker-form>
+        </app-dialog>
 
-      <app-dialog
-        [title]="addEventModalTitle()"
-        [open]="isAddEventModalOpen()"
-        (onClose)="this.currentTracker.set(undefined)"
-      >
-        <app-event-form (onFormSubmit)="addEvent($event)"></app-event-form>
-      </app-dialog>
+        <app-dialog
+          [title]="addEventModalTitle()"
+          [open]="isAddEventModalOpen()"
+          (onClose)="this.currentTracker.set(undefined)"
+        >
+          <app-event-form (onFormSubmit)="addEvent($event)"></app-event-form>
+        </app-dialog>
+      </div>
     </div>
   `,
 })

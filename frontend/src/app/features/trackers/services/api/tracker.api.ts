@@ -1,4 +1,4 @@
-import { inject, Service } from '@angular/core';
+import { inject, Service, Signal } from '@angular/core';
 import { environment } from '../../../../environments/environment';
 import { HttpClient, httpResource } from '@angular/common/http';
 import { CreateTracker, Tracker } from '../../tracker.types';
@@ -8,6 +8,10 @@ import { Observable } from 'rxjs';
 export class TrackerApi {
   private apiUrl = `${environment.apiUrl}/tracker`;
   private http = inject(HttpClient);
+
+  public getTracker(id: Signal<string>) {
+    return httpResource<Tracker>(() => `${this.apiUrl}/${id()}`);
+  }
 
   public getTrackers() {
     return httpResource<Tracker[]>(() => this.apiUrl, { defaultValue: [] });

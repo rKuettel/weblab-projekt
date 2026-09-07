@@ -2,9 +2,11 @@ import { Component, computed, input, output } from '@angular/core';
 import { Tracker } from '../../tracker.types';
 import { ButtonComponent } from '../../../../components/button/button.component';
 import { TranslatePipe } from '@ngx-translate/core';
+import { RouterLink } from '@angular/router';
+import { TrackerSummaryComponent } from '../tracker-summary/tracker-summary.component';
 
 @Component({
-  imports: [ButtonComponent, TranslatePipe],
+  imports: [ButtonComponent, TrackerSummaryComponent, TranslatePipe, RouterLink],
   selector: 'app-tracker-card',
   styles: `
     :host {
@@ -15,7 +17,6 @@ import { TranslatePipe } from '@ngx-translate/core';
       height: 100%;
       display: flex;
       flex-direction: column;
-      background: #ffffff;
       border: 1px solid #e5e7eb;
       border-radius: 16px;
       padding: 24px;
@@ -41,16 +42,6 @@ import { TranslatePipe } from '@ngx-translate/core';
       justify-content: center;
     }
 
-    .summary {
-      /* Using Mono-Space Fonts defined in picocss: https://github.com/picocss/pico/blob/main/css/pico.jade.css */
-      font-family:
-        ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
-      line-height: 1;
-      font-weight: 700;
-      display: block;
-      white-space: nowrap;
-    }
-
     .footer {
       display: flex;
       gap: 1rem;
@@ -60,13 +51,15 @@ import { TranslatePipe } from '@ngx-translate/core';
     <div class="card">
       <h3>{{ tracker().name }}</h3>
       <div class="content">
-        <span class="summary" [style.font-size]="fontSize()">
-          <!-- <span class="summary"> -->
-          {{ tracker().summary }}
-        </span>
+        <app-tracker-summary [summary]="tracker().summary"></app-tracker-summary>
       </div>
       <div class="footer">
-        <app-button [fullWidth]="true" [text]="'tracker.view' | translate"> </app-button>
+        <app-button
+          [fullWidth]="true"
+          [routerLink]="['tracker', this.tracker().id]"
+          [text]="'tracker.view' | translate"
+        >
+        </app-button>
         <app-button
           [fullWidth]="true"
           (clicked)="addEvent()"
@@ -79,16 +72,14 @@ import { TranslatePipe } from '@ngx-translate/core';
 })
 export class TrackerCardComponent {
   readonly tracker = input.required<Tracker>();
+  readonly onViewClick = output<string>();
   readonly onAddEventClick = output<string>();
-
-  fontSize = computed(() => {
-    const digits = this.tracker().summary.toString().length;
-    // Divide by 0.6 since this is the recommended ratio between height and width of a monospaced font
-    const size = Math.min(100 / digits / 0.6, 50);
-    return `${size}cqw`;
-  });
 
   addEvent() {
     this.onAddEventClick.emit(this.tracker().id);
+  }
+
+  viewClicked() {
+    this.onViewClick.emit(this.tracker().id);
   }
 }

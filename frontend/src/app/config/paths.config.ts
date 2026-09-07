@@ -1,9 +1,8 @@
-import { NavigationItem } from "../components/navigation/navigation.type";
+import { NavigationItem } from '../components/navigation/navigation.type';
 
 export const PATHS: { [key: string]: NavigationItem } = {
   HOME: {
     path: '',
-    translationId: 'nav.home'
+    translationId: 'nav.home',
   },
-}
-
+};

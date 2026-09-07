@@ -5,6 +5,7 @@ import { Tracker } from '../schemas/tracker.schema.js';
 import { Model } from 'mongoose';
 import type { Connection } from 'mongoose';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
+import { time } from 'console';
 
 @Injectable()
 export class EventService {
@@ -42,8 +43,18 @@ export class EventService {
     return this.trackerModel.findById(trackerId).exec();
   }
 
-  findAll(trackerId: string) {
-    return this.eventModel.find({ trackerId: trackerId }).exec();
+  findInRange(trackerId: string, from?: Date, to?: Date) {
+    console.log(from);
+    console.log(to);
+    const timestamp: Record<string, Date> = {
+      ...(from && { $gte: from }),
+      ...(to && { $lt: to }),
+    };
+
+    console.log(timestamp);
+    return this.eventModel
+      .find({ trackerId, ...(from || to ? { timestamp } : {}) })
+      .exec();
   }
 
   update(trackerId: string, id: number, updateEventDto: UpdateEventDto) {
