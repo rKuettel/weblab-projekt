@@ -12,6 +12,7 @@ import {
   daysAgo,
 } from '../../../../components/date-range-selector/date-range-selector.component';
 import { CalendarHeatmapComponent } from '../../../../components/calendar-heatmap/calendar-heatmap.component';
+import { BarChartComponent } from '../../../../components/bar-chart/bar-chart.component';
 
 @Component({
   imports: [
@@ -19,6 +20,7 @@ import { CalendarHeatmapComponent } from '../../../../components/calendar-heatma
     DateRangeSelectorComponent,
     TrackerSummaryComponent,
     CalendarHeatmapComponent,
+    BarChartComponent,
   ],
   selector: 'app-tracker-detail',
   styles: `
@@ -109,6 +111,13 @@ import { CalendarHeatmapComponent } from '../../../../components/calendar-heatma
             >
           }
         </article>
+
+        <article class="heatmap" [aria-busy]="this.trackerEvents.isLoading()">
+          @if (this.heatMapData()) {
+            <h3>Bar Chart</h3>
+            <app-bar-chart [data]="this.barChartData()"> ></app-bar-chart>
+          }
+        </article>
       </div>
     </div>
   `,
@@ -164,6 +173,16 @@ export class TrackerDetailComponent {
       return {
         date: new Date(date),
         value: sum,
+      };
+    });
+  });
+
+  public barChartData = computed(() => {
+    const events = this.trackerEvents.value().reverse();
+    return events.map((e) => {
+      return {
+        value: e.data.delta,
+        name: e.timestamp.toDateString(),
       };
     });
   });

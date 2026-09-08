@@ -1,19 +1,29 @@
+import type { EChartsCoreOption } from 'echarts/core';
+import { NgxEchartsDirective, provideEchartsCore } from 'ngx-echarts';
+import * as echarts from 'echarts/core';
+import { BarChart, HeatmapChart } from 'echarts/charts';
 import {
-  afterEveryRender,
-  afterNextRender,
-  Component,
-  computed,
-  DestroyRef,
-  ElementRef,
-  inject,
-  input,
-  Input,
-  OnChanges,
-  signal,
-} from '@angular/core';
-import { Color, ScaleType } from '@swimlane/ngx-charts';
-import { HeatMapModule } from '@swimlane/ngx-charts';
+  GridComponent,
+  TooltipComponent,
+  LegendComponent,
+  TitleComponent,
+  VisualMapComponent,
+  CalendarComponent,
+} from 'echarts/components';
+import { CanvasRenderer } from 'echarts/renderers';
+import { Component, computed, input } from '@angular/core';
 import { DateRange } from '../date-range-selector/date-range-selector.component';
+echarts.use([
+  BarChart,
+  GridComponent,
+  CanvasRenderer,
+  TooltipComponent,
+  LegendComponent,
+  TitleComponent,
+  VisualMapComponent,
+  CalendarComponent,
+  HeatmapChart,
+]);
 
 export interface CalendarHeatmapData {
   date: Date;
@@ -21,24 +31,10 @@ export interface CalendarHeatmapData {
 }
 
 @Component({
-  imports: [HeatMapModule],
+  imports: [NgxEchartsDirective],
+  providers: [provideEchartsCore({ echarts })],
   selector: 'app-calendar-heatmap',
-  template: `
-    <div class="calendar-heatmap">
-      <ngx-charts-heat-map
-        [scheme]="colorScheme"
-        [view]="view()"
-        [results]="calendarData()"
-        [xAxis]="true"
-        [yAxis]="true"
-        [legend]="true"
-        xAxisLabel="Week"
-        yAxisLabel="Day of Week"
-        (select)="onSelect($event)"
-      >
-      </ngx-charts-heat-map>
-    </div>
-  `,
+  template: ` <div echarts [options]="options()"></div> `,
   styles: `
     :host {
       width: 100%;
@@ -68,117 +64,62 @@ export interface CalendarHeatmapData {
   `,
 })
 export class CalendarHeatmapComponent {
-  private weekdayName = new Intl.DateTimeFormat(undefined, { weekday: 'short' });
   readonly data = input<CalendarHeatmapData[]>([]);
   readonly dateRange = input.required<DateRange>();
   readonly aspectRatio = input<number>(2);
 
-  private readonly host = inject(ElementRef<HTMLElement>);
-  private readonly destroyRef = inject(DestroyRef);
-
-  readonly width = signal(0);
-  readonly view = computed<[number, number]>(() => {
-    const width = this.width();
-    const height = width / this.aspectRatio();
-    return [width, height];
-  });
-
-  constructor() {
-    afterEveryRender(() => {
-      const element = this.host.nativeElement;
-
-      const update = () => {
-        this.width.set(element.getBoundingClientRect().width);
-      };
-
-      const observer = new ResizeObserver(update);
-
-      observer.observe(element);
-
-      this.destroyRef.onDestroy(() => observer.disconnect());
-    });
-  }
-
-  public calendarData = computed(() => {
+  options = computed<EChartsCoreOption>(() => {
     const dateRange = this.dateRange();
-    dateRange.from?.setDate(dateRange.from.getDate() - (dateRange.from.getDay() - 1));
-    const days = this.getDatesBetween(dateRange.from, dateRange.to);
-    const initData = days.map((d) => {
-      return {
-        name: this.getXAxisLabel(d),
-        series: [
-          {
-            name: this.getYAxisLabel(d),
-            value: 0,
-          },
-        ],
-      };
+
+    let dateRangeEchart;
+
+    if (!dateRange.from || !dateRange.to) {
+      dateRangeEchart = new Date().getFullYear();
+    } else {
+      dateRangeEchart = [
+        dateRange.from.toISOString().split('T')[0],
+        dateRange.to.toISOString().split('T')[0],
+      ];
+    }
+
+    console.log('DateRangeEchart: ', dateRangeEchart);
+
+    const data = this.data().map((d) => {
+      return [d.date.toISOString().split('T')[0], d.value];
     });
 
-    const data = this.data().map((item) => {
-      return {
-        name: this.getXAxisLabel(item.date),
-        series: [
-          {
-            name: this.getYAxisLabel(item.date),
-            value: item.value,
-          },
-        ],
-      };
-    });
-    return [...initData, ...data];
+    const max = this.data().reduce((max, d) => Math.max(max, d.value), 0);
+
+    return {
+      tooltip: {
+        formatter: function (params: any) {
+          return `${params.value[0]}: ${params.value[1]}`;
+        },
+      },
+      visualMap: {
+        min: 0,
+        max: max,
+        splitNumber: 10,
+        precision: 0,
+        type: 'piecewise',
+        orient: 'vertical',
+        left: 'right',
+      },
+      calendar: {
+        left: 30,
+        right: 100,
+        cellSize: ['auto', 'auto'],
+        range: dateRangeEchart,
+        itemStyle: {
+          borderWidth: 0.5,
+        },
+        yearLabel: { show: false },
+      },
+      series: {
+        type: 'heatmap',
+        coordinateSystem: 'calendar',
+        data: data,
+      },
+    };
   });
-  // public view: [number, number] = [900, 180];
-  public colorScheme: Color = {
-    name: 'heatmap',
-    selectable: true,
-    group: ScaleType.Ordinal,
-    domain: ['#ebedf0', '#c6e48b', '#7bc96f', '#239a3b', '#196127'],
-  };
-
-  private getDatesBetween(startDate?: Date, endDate?: Date): Date[] {
-    if (!startDate || !endDate) {
-      return [];
-    }
-    const dates: Date[] = [];
-
-    let current = new Date(startDate);
-    current.setHours(0, 0, 0, 0);
-
-    const finalDate = new Date(endDate);
-    finalDate.setHours(0, 0, 0, 0);
-
-    while (current <= finalDate) {
-      // We push a NEW Date object because 'current' is being mutated
-      dates.push(new Date(current));
-
-      // Increment by one day
-      current.setDate(current.getDate() + 1);
-    }
-
-    return dates;
-  }
-
-  private getWeekOfYear(date: Date): number {
-    const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-
-    d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
-
-    const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-
-    return Math.ceil(((d.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
-  }
-
-  private getXAxisLabel(date: Date): string {
-    return `${this.getWeekOfYear(date)} - ${date.getFullYear()}`;
-  }
-
-  private getYAxisLabel(date: Date): string {
-    const dayOfTheWeek = this.weekdayName.format(date);
-    return dayOfTheWeek;
-  }
-
-  onSelect(event: any): void {
-    console.log('Selected day:', event);
-  }
 }
