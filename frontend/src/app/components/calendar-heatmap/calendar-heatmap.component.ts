@@ -1,4 +1,16 @@
-import { Component, computed, input, Input, OnChanges } from '@angular/core';
+import {
+  afterEveryRender,
+  afterNextRender,
+  Component,
+  computed,
+  DestroyRef,
+  ElementRef,
+  inject,
+  input,
+  Input,
+  OnChanges,
+  signal,
+} from '@angular/core';
 import { Color, ScaleType } from '@swimlane/ngx-charts';
 import { HeatMapModule } from '@swimlane/ngx-charts';
 import { DateRange } from '../date-range-selector/date-range-selector.component';
@@ -15,37 +27,26 @@ export interface CalendarHeatmapData {
     <div class="calendar-heatmap">
       <ngx-charts-heat-map
         [scheme]="colorScheme"
+        [view]="view()"
         [results]="calendarData()"
         [xAxis]="true"
         [yAxis]="true"
+        [legend]="true"
         xAxisLabel="Week"
         yAxisLabel="Day of Week"
         (select)="onSelect($event)"
       >
       </ngx-charts-heat-map>
-
-      <div class="legend">
-        <span>Less</span>
-
-        @for (color of this.colorScheme.domain; track $index) {
-          <span class="legend-square" [style.background]="color"> </span>
-        }
-
-        <span>More</span>
-      </div>
     </div>
   `,
   styles: `
+    :host {
+      width: 100%;
+    }
     .calendar-heatmap {
       width: 100%;
       padding: 16px;
       box-sizing: border-box;
-
-      h3 {
-        margin: 0 0 12px;
-        font-size: 16px;
-        font-weight: 600;
-      }
     }
 
     .legend {
@@ -70,9 +71,37 @@ export class CalendarHeatmapComponent {
   private weekdayName = new Intl.DateTimeFormat(undefined, { weekday: 'short' });
   readonly data = input<CalendarHeatmapData[]>([]);
   readonly dateRange = input.required<DateRange>();
+  readonly aspectRatio = input<number>(2);
+
+  private readonly host = inject(ElementRef<HTMLElement>);
+  private readonly destroyRef = inject(DestroyRef);
+
+  readonly width = signal(0);
+  readonly view = computed<[number, number]>(() => {
+    const width = this.width();
+    const height = width / this.aspectRatio();
+    return [width, height];
+  });
+
+  constructor() {
+    afterEveryRender(() => {
+      const element = this.host.nativeElement;
+
+      const update = () => {
+        this.width.set(element.getBoundingClientRect().width);
+      };
+
+      const observer = new ResizeObserver(update);
+
+      observer.observe(element);
+
+      this.destroyRef.onDestroy(() => observer.disconnect());
+    });
+  }
 
   public calendarData = computed(() => {
     const dateRange = this.dateRange();
+    dateRange.from?.setDate(dateRange.from.getDate() - (dateRange.from.getDay() - 1));
     const days = this.getDatesBetween(dateRange.from, dateRange.to);
     const initData = days.map((d) => {
       return {
@@ -99,7 +128,7 @@ export class CalendarHeatmapComponent {
     });
     return [...initData, ...data];
   });
-  public view: [number, number] = [900, 180];
+  // public view: [number, number] = [900, 180];
   public colorScheme: Color = {
     name: 'heatmap',
     selectable: true,
