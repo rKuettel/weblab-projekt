@@ -10,7 +10,8 @@
     "required": "{{ field }} is required"
   },
   "button": {
-    "submit": "Submit"
+    "submit": "Submit",
+    "confirm": "Confirm"
   },
   "tracker": {
     "form": {
@@ -18,10 +19,17 @@
       "type": "Type"
     },
     "add": "Add Tracker",
-    "view": "View"
+    "view": "View",
+    "edit": "Edit",
+    "delete": "Delete",
+    "confirmDelete": "Confirm Deletion",
+    "confirmDeleteLong": "Are you sure you want to delete this Tracker?"
   },
   "event": {
-    "add": "Add Event"
+    "add": "Add Event",
+    "delete": "Delete",
+    "confirmDelete": "Confirm Deletion",
+    "confirmDeleteLong": "Are you sure you want to delete this Event?"
   },
   "dateRangeSelector": {
     "from": "Start Date",

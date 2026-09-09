@@ -14,4 +14,5 @@
 | 7. Sept   | 4.5h    | Erste implementation einer Calendar Heat Map                                                  |
 | 8. Sept   | 2.5h    | Migration von ngx-charts zu ngx-echarts anfgrund von Kompatabilitäts problemen mit Angular 22 |
 | 9. Sept   | 5.5h    | Erstellung von Unittests für Frontend Komponenten                                             |
-| **Total** | 36h     |                                                                                               |
+| 9. Sept   | 4h      | Löschen und editieren implementiert                                                           |
+| **Total** | 40h     |                                                                                               |

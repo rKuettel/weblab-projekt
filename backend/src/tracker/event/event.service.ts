@@ -1,18 +1,17 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateEventDto } from './dto/create-event.dto.js';
-import { UpdateEventDto } from './dto/update-event.dto.js';
 import { Tracker } from '../schemas/tracker.schema.js';
 import { Model } from 'mongoose';
 import type { Connection } from 'mongoose';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
-import { time } from 'console';
+import { CounterEvent, TrackerEvent } from './schemas/event.schemas.js';
 
 @Injectable()
 export class EventService {
   constructor(
     @InjectConnection() private readonly connection: Connection,
     @InjectModel(Tracker.name) private trackerModel: Model<Tracker>,
-    @InjectModel(Event.name) private eventModel: Model<Event>,
+    @InjectModel(TrackerEvent.name) private eventModel: Model<TrackerEvent>,
   ) {}
 
   async create(trackerId: string, createEventDto: CreateEventDto) {
@@ -43,25 +42,44 @@ export class EventService {
     return this.trackerModel.findById(trackerId).exec();
   }
 
-  findInRange(trackerId: string, from?: Date, to?: Date) {
-    console.log(from);
-    console.log(to);
+  async findInRange(trackerId: string, from?: Date, to?: Date) {
     const timestamp: Record<string, Date> = {
       ...(from && { $gte: from }),
       ...(to && { $lt: to }),
     };
 
-    console.log(timestamp);
     return this.eventModel
       .find({ trackerId, ...(from || to ? { timestamp } : {}) })
       .exec();
   }
 
-  update(trackerId: string, id: number, updateEventDto: UpdateEventDto) {
-    return `This action updates a #${id} event`;
-  }
+  async remove(trackerId: string, id: string) {
+    const event = await this.eventModel.findById(id).exec();
+    if (!event) {
+      throw new NotFoundException(`Event with id ${id} not found`);
+    }
+    if (event.type !== 'counter') {
+      throw new Error('Unkown event type');
+    }
+    const session = await this.connection.startSession();
+    try {
+      await session.withTransaction(async () => {
+        const data = event.data as CounterEvent;
+        this.trackerModel
+          .updateOne(
+            { _id: trackerId },
+            {
+              $inc: {
+                summary: -data.delta,
+              },
+            },
+          )
+          .exec();
 
-  remove(trackerId: string, id: number) {
-    return `This action removes a #${id} event`;
+        event.deleteOne().exec();
+      });
+    } finally {
+      session.endSession();
+    }
   }
 }

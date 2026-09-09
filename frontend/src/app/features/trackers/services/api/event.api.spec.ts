@@ -94,4 +94,15 @@ describe('EventApi', () => {
       expect(emitted).toEqual([tracker]);
     });
   });
+
+  describe('deleteEvent', () => {
+    it('should delete the event by tracker and event id', () => {
+      service.deleteEvent('42', 'e1').subscribe();
+
+      const request = httpTesting.expectOne(
+        (req) => req.method === 'DELETE' && req.url === 'api/tracker/42/event/e1',
+      );
+      request.flush({});
+    });
+  });
 });

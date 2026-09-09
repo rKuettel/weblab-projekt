@@ -27,7 +27,7 @@ import { Component, input, output } from '@angular/core';
   `,
 })
 export class DialogComponent {
-  title = input.required<string>();
-  open = input(false);
-  onClose = output<void>();
+  readonly title = input.required<string>();
+  readonly open = input(false);
+  readonly onClose = output<void>();
 }

@@ -41,6 +41,10 @@ export class EventApi {
   public addEvent(trackerId: string, event: CreateTrackerEvent): Observable<Tracker> {
     return this.http.post<Tracker>(this.apiUrl(trackerId), event);
   }
+
+  public deleteEvent(trackerId: string, eventId: string): Observable<{}> {
+    return this.http.delete(`${this.apiUrl(trackerId)}/${eventId}`);
+  }
 }
 
 export interface EventsQueryParams {

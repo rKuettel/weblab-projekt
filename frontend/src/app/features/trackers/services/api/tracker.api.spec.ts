@@ -71,4 +71,34 @@ describe('TrackerApi', () => {
       expect(emitted).toEqual([created]);
     });
   });
+
+  describe('editTracker', () => {
+    it('should patch the tracker and emit the updated tracker', async () => {
+      const updated = makeTracker({ id: '42', name: 'Renamed' });
+
+      const emitted: Tracker[] = [];
+      service.editTracker('42', { name: 'Renamed' }).subscribe((t) => emitted.push(t));
+
+      const request = httpTesting.expectOne(
+        (req) => req.method === 'PATCH' && req.url === 'api/tracker/42',
+      );
+      expect(request.request.body).toEqual({ name: 'Renamed' });
+
+      request.flush(updated);
+      await TestBed.inject(ApplicationRef).whenStable();
+
+      expect(emitted).toEqual([updated]);
+    });
+  });
+
+  describe('deleteTracker', () => {
+    it('should delete the tracker by id', () => {
+      service.deleteTracker('42').subscribe();
+
+      const request = httpTesting.expectOne(
+        (req) => req.method === 'DELETE' && req.url === 'api/tracker/42',
+      );
+      request.flush({});
+    });
+  });
 });

@@ -1,7 +1,7 @@
 import { Component, computed, inject, Signal, signal } from '@angular/core';
 import { TrackerApi } from '../../services/api/tracker.api';
 import { EventApi } from '../../services/api/event.api';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { EventListComponent } from '../../dumb/event-list/event-list.component';
 import { TrackerSummaryComponent } from '../../dumb/tracker-summary/tracker-summary.component';
 import {
@@ -11,6 +11,12 @@ import {
 } from '../../../../components/date-range-selector/date-range-selector.component';
 import { CalendarHeatmapComponent } from '../../../../components/calendar-heatmap/calendar-heatmap.component';
 import { BarChartComponent } from '../../../../components/bar-chart/bar-chart.component';
+import { ButtonComponent } from '../../../../components/button/button.component';
+import { ConfirmDialogComponent } from '../../../../components/confirm-dialog/confirm-dialog.component';
+import { TranslatePipe } from '@ngx-translate/core';
+import { DialogComponent } from '../../../../components/dialog/dialog.component';
+import { TrackerFormComponent } from '../../dumb/tracker-form/tracker-form.component';
+import { CreateTracker } from '../../tracker.types';
 
 @Component({
   imports: [
@@ -19,14 +25,28 @@ import { BarChartComponent } from '../../../../components/bar-chart/bar-chart.co
     TrackerSummaryComponent,
     CalendarHeatmapComponent,
     BarChartComponent,
+    ButtonComponent,
+    ConfirmDialogComponent,
+    TranslatePipe,
+    DialogComponent,
+    TrackerFormComponent,
   ],
   selector: 'app-tracker-detail',
   styles: `
     .header {
       display: flex;
+      gap: 1rem;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 1rem;
+    }
+    .toolbar {
+      display: flex;
+      width: 100%;
+      align-items: center;
+    }
+    .actions {
+      display: flex;
+      gap: 0.5rem;
     }
 
     .header h2 {
@@ -68,7 +88,21 @@ import { BarChartComponent } from '../../../../components/bar-chart/bar-chart.co
   `,
   template: `
     <div class="header">
-      <h2>Trackers</h2>
+      <h2>Tracker: {{ this.tracker.value()?.name || '' }}</h2>
+
+      <div class="actions">
+        <app-button
+          [text]="'tracker.edit' | translate"
+          (clicked)="editDialogOpen.set(true)"
+        ></app-button>
+        <app-button
+          variant="secondary"
+          [text]="'tracker.delete' | translate"
+          (clicked)="deleteDialogOpen.set(true)"
+        ></app-button>
+      </div>
+    </div>
+    <div class="toolbar">
       <app-date-range-selector
         (changed)="dateRangeChanged.set($event)"
         [dateRange]="this.dateRange()"
@@ -80,7 +114,10 @@ import { BarChartComponent } from '../../../../components/bar-chart/bar-chart.co
         <article class="events" [aria-busy]="this.trackerEvents.isLoading()">
           <h3>Events</h3>
 
-          <app-event-list [events]="trackerEvents.value()"></app-event-list>
+          <app-event-list
+            [events]="trackerEvents.value()"
+            (onDelete)="this.deleteEvent($event)"
+          ></app-event-list>
         </article>
       }
 
@@ -118,11 +155,33 @@ import { BarChartComponent } from '../../../../components/bar-chart/bar-chart.co
         </article>
       </div>
     </div>
+    <app-confirm-dialog
+      [title]="'tracker.confirmDelete' | translate"
+      [text]="'tracker.confirmDeleteLong' | translate"
+      [open]="deleteDialogOpen()"
+      (onClose)="deleteDialogOpen.set(false)"
+      (confirmed)="deleteTracker()"
+    ></app-confirm-dialog>
+
+    <app-dialog
+      [title]="'tracker.Edit' | translate"
+      [open]="editDialogOpen()"
+      (onClose)="editDialogOpen.set(false)"
+    >
+      <app-tracker-form
+        [tracker]="this.tracker.value()"
+        [typeDisabled]="true"
+        (onFormSubmit)="updateTracker($event)"
+      ></app-tracker-form>
+    </app-dialog>
   `,
 })
 export class TrackerDetailComponent {
+  private router = inject(Router);
   private activatedRoute = inject(ActivatedRoute);
   readonly trackerId = signal(this.activatedRoute.snapshot.params['id']);
+  readonly deleteDialogOpen = signal(false);
+  readonly editDialogOpen = signal(false);
 
   public dateRange = signal<DateRange>({
     from: daysAgo(7),
@@ -149,9 +208,9 @@ export class TrackerDetailComponent {
     };
   });
 
-  private api = inject(TrackerApi);
+  private trackerApi = inject(TrackerApi);
   private eventApi = inject(EventApi);
-  public tracker = this.api.getTracker(this.trackerId);
+  public tracker = this.trackerApi.getTracker(this.trackerId);
   public trackerEvents = this.eventApi.getTrackerEvents(this.trackerId, this.dateRangeTransformed);
 
   public heatMapData = computed(() => {
@@ -193,6 +252,30 @@ export class TrackerDetailComponent {
   constructor() {
     this.activatedRoute.params.subscribe((params) => {
       this.trackerId.set(params['id']);
+    });
+  }
+
+  deleteEvent(eventId: string) {
+    this.eventApi.deleteEvent(this.trackerId(), eventId).subscribe(() => {
+      this.trackerEvents.reload();
+      this.tracker.reload();
+    });
+  }
+
+  deleteTracker() {
+    this.trackerApi.deleteTracker(this.trackerId()).subscribe(() => {
+      this.router.navigate(['']);
+    });
+  }
+
+  updateTracker(updatedTracker: CreateTracker) {
+    const updatedTrackerName = {
+      name: updatedTracker.name,
+    };
+
+    this.trackerApi.editTracker(this.trackerId(), updatedTrackerName).subscribe((tracker) => {
+      this.tracker.set(tracker);
+      this.editDialogOpen.set(false);
     });
   }
 }

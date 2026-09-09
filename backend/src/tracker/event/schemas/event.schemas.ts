@@ -1,10 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
 
-export type EventDocument = HydratedDocument<Event>;
+export type TrackerEventDocument = HydratedDocument<TrackerEvent>;
 
 @Schema()
-export class Event {
+export class TrackerEvent {
   @Prop({
     type: Types.ObjectId,
     ref: 'Tracker',
@@ -19,25 +19,25 @@ export class Event {
   timestamp: Date;
 
   @Prop({ required: true })
-  type: EventType;
+  type: TrackerEventType;
 
   @Prop({
     type: Types.Map,
     required: true,
   })
-  data: CounterEvent | CategoryEvent;
+  data: EventData;
 }
 
-@Schema()
+export type EventData = CounterEvent | CategoryEvent;
+
 export class CounterEvent {
   delta: number;
 }
 
-@Schema()
 export class CategoryEvent {
   category: string;
 }
 
-export const EventSchema = SchemaFactory.createForClass(Event);
+export const TrackerEventSchema = SchemaFactory.createForClass(TrackerEvent);
 
-export type EventType = 'counter';
+export type TrackerEventType = 'counter';

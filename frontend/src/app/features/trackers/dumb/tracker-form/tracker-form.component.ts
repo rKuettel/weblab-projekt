@@ -1,5 +1,5 @@
-import { Component, computed, output, signal } from '@angular/core';
-import { form, FormField, required } from '@angular/forms/signals';
+import { Component, computed, input, linkedSignal, output, signal } from '@angular/core';
+import { disabled, form, FormField, required } from '@angular/forms/signals';
 import { CreateTracker, DEFAULT_TRACKER, TRACKER_TYPES } from '../../tracker.types';
 import { InputComponent } from '../../../../components/input/input.component';
 import { TitleCasePipe } from '@angular/common';
@@ -47,9 +47,12 @@ export class TrackerFormComponent {
   readonly types = Object.values(TRACKER_TYPES);
   readonly nameLabel = translate('tracker.form.name');
 
-  private readonly trackerModel = signal<CreateTracker>({ ...DEFAULT_TRACKER });
+  readonly tracker = input<CreateTracker>();
+  readonly typeDisabled = input(false);
+  private readonly trackerModel = linkedSignal(() => this.tracker() ?? { ...DEFAULT_TRACKER });
 
   readonly trackerForm = form(this.trackerModel, (path) => {
+    disabled(path.type, { when: ({}) => this.typeDisabled() });
     requiredTrimmed(
       path.name,
       translate('validation.required', () => ({
