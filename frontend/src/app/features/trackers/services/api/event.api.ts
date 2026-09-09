@@ -1,7 +1,7 @@
 import { inject, Service, Signal } from '@angular/core';
 import { environment } from '../../../../environments/environment';
 import { HttpClient, httpResource } from '@angular/common/http';
-import { CreateTrackerEvent, TrackerEvent, TrackerEventData } from '../../events.types';
+import { CreateTrackerEvent, TrackerEvent } from '../../events.types';
 import { Observable } from 'rxjs';
 import { Tracker } from '../../tracker.types';
 

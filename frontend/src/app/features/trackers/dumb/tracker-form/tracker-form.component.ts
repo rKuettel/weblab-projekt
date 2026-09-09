@@ -15,7 +15,7 @@ import { requiredTrimmed } from '../../../../services/requiredTrimmed.validator'
     <form class="tracker-form" (submit)="submitForm($event)">
       <div>
         <app-input
-          [label]="'tracker.form.name' | translate"
+          [label]="this.nameLabel()"
           type="text"
           [formField]="trackerForm.name"
         ></app-input>
@@ -23,7 +23,7 @@ import { requiredTrimmed } from '../../../../services/requiredTrimmed.validator'
 
       <div>
         <label for="type">
-          {{ this.nameLabel() }}
+          {{ 'tracker.form.type' | translate }}
           <select id="type" [formField]="trackerForm.type">
             @for (type of types; track type) {
               <option [value]="type">{{ type | titlecase }}</option>

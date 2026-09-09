@@ -1,5 +1,5 @@
 import { Component, input, output } from '@angular/core';
-import { CreateTrackerEvent, TrackerEvent } from '../../events.types';
+import { TrackerEvent } from '../../events.types';
 import { ButtonComponent } from '../../../../components/button/button.component';
 
 @Component({
@@ -12,10 +12,10 @@ import { ButtonComponent } from '../../../../components/button/button.component'
   `,
   template: `
     @for (
-      event of this.events().sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+      event of [...this.events()].sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
       track event.id
     ) {
-      <div>
+      <div class="event">
         <p>Timestamp: {{ event.timestamp }}</p>
         <p>Data: {{ event.data.delta }}</p>
         <app-button

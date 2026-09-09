@@ -1,15 +1,5 @@
-import {
-  Component,
-  input,
-  linkedSignal,
-  model,
-  output,
-  Signal,
-  signal,
-  WritableSignal,
-} from '@angular/core';
+import { Component, input, linkedSignal, output } from '@angular/core';
 import { InputComponent } from '../input/input.component';
-import { from } from 'rxjs';
 import { form, FormField, validate } from '@angular/forms/signals';
 import { translate, TranslatePipe } from '@ngx-translate/core';
 
@@ -70,14 +60,14 @@ export class DateRangeSelectorComponent {
     }
   }
 
-  toFormModel(range: DateRange): DateRangeFormModel {
+  private toFormModel(range: DateRange): DateRangeFormModel {
     return {
       from: toDateString(range.from),
       to: toDateString(range.to),
     };
   }
 
-  toDateRange(range: DateRangeFormModel): DateRange {
+  private toDateRange(range: DateRangeFormModel): DateRange {
     const from = range.from.trim();
     const to = range.to.trim();
     return {

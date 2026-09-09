@@ -4,8 +4,8 @@ import { NgxEchartsDirective, provideEchartsCore } from 'ngx-echarts';
 import * as echarts from 'echarts/core';
 import { BarChart } from 'echarts/charts';
 import { GridComponent, TooltipComponent, LegendComponent } from 'echarts/components';
-import { CanvasRenderer } from 'echarts/renderers';
-echarts.use([BarChart, GridComponent, CanvasRenderer, TooltipComponent, LegendComponent]);
+import { CanvasRenderer, SVGRenderer } from 'echarts/renderers';
+echarts.use([BarChart, GridComponent, SVGRenderer, TooltipComponent, LegendComponent]);
 
 export interface BarChartData {
   name: string;

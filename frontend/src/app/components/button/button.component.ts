@@ -1,4 +1,4 @@
-import { Component, computed, HostBinding, input, output } from '@angular/core';
+import { Component, HostBinding, input, output } from '@angular/core';
 
 export type ButtonVariant = 'primary' | 'secondary';
 export type ButtonType = 'button' | 'submit' | 'reset';

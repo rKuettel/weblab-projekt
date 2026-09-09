@@ -1,4 +1,4 @@
-import { Component, HostBinding, input, output, signal } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 
 @Component({
   selector: 'app-dialog',

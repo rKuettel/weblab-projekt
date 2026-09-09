@@ -14,7 +14,7 @@ import { Field, FormField } from '@angular/forms/signals';
         (change)="change.emit()"
       />
       @for (error of formField()().errors(); track error) {
-        <small>{{ error.message }}</small>
+        <small [attr.data-testid]="'error-' + this.label()">{{ error.message }}</small>
       }
     </label>
   `,

@@ -33,6 +33,7 @@
     "jsdom": "^28.1.0",
     "postcss": "^8.5.26",
     "prettier": "^3.9.6",
+    "resize-observer-polyfill": "^1.5.1",
     "tailwindcss": "^4.3.3",
     "typescript": "~6.0.3",
     "vitest": "^4.1.11"

@@ -10,13 +10,13 @@ import {
   VisualMapComponent,
   CalendarComponent,
 } from 'echarts/components';
-import { CanvasRenderer } from 'echarts/renderers';
+import { CanvasRenderer, SVGRenderer } from 'echarts/renderers';
 import { Component, computed, input } from '@angular/core';
 import { DateRange } from '../date-range-selector/date-range-selector.component';
 echarts.use([
   BarChart,
   GridComponent,
-  CanvasRenderer,
+  SVGRenderer,
   TooltipComponent,
   LegendComponent,
   TitleComponent,
@@ -34,7 +34,7 @@ export interface CalendarHeatmapData {
   imports: [NgxEchartsDirective],
   providers: [provideEchartsCore({ echarts })],
   selector: 'app-calendar-heatmap',
-  template: ` <div echarts [options]="options()"></div> `,
+  template: `<div echarts [options]="options()" class="demo-chart"></div> `,
   styles: `
     :host {
       width: 100%;

@@ -2,10 +2,8 @@ import { Component, computed, inject, Signal, signal } from '@angular/core';
 import { TrackerApi } from '../../services/api/tracker.api';
 import { EventApi } from '../../services/api/event.api';
 import { ActivatedRoute } from '@angular/router';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { EventListComponent } from '../../dumb/event-list/event-list.component';
 import { TrackerSummaryComponent } from '../../dumb/tracker-summary/tracker-summary.component';
-import { InputComponent } from '../../../../components/input/input.component';
 import {
   DateRange,
   DateRangeSelectorComponent,
@@ -138,11 +136,15 @@ export class TrackerDetailComponent {
   private dateRangeTransformed = computed(() => {
     const date = this.dateRangeChanged();
     const to = date.to;
+    const from = date.from;
     if (to) {
       to.setHours(23, 59, 59);
     }
+    if (from) {
+      from.setHours(0, 0, 0);
+    }
     return {
-      from: date.from,
+      from: from,
       to: to,
     };
   });
@@ -178,7 +180,8 @@ export class TrackerDetailComponent {
   });
 
   public barChartData = computed(() => {
-    const events = this.trackerEvents.value().reverse();
+    // Copy before reversing so the resource's array is not mutated.
+    const events = [...this.trackerEvents.value()].reverse();
     return events.map((e) => {
       return {
         value: e.data.delta,

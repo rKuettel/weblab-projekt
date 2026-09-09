@@ -57,6 +57,7 @@ import { translate, TranslatePipe } from '@ngx-translate/core';
       <div class="header">
         <h2>Trackers</h2>
         <app-button
+          data-testid="add-tracker-btn"
           [text]="'tracker.add' | translate"
           (clicked)="this.isAddTrackerModalOpen.set(true)"
         ></app-button>
@@ -105,9 +106,12 @@ export class TrackerDashboardComponent {
 
   addTracker(tracker: CreateTracker) {
     console.log('Creating new Tracker: ', tracker);
-    this.api
-      .createTracker(tracker)
-      .subscribe((t) => this.trackers.update((trackers) => [...trackers, t]));
+    this.api.createTracker(tracker).subscribe((t) => {
+      console.log('Run update: ', t);
+      this.trackers.update((trackers) => [...trackers, t]);
+
+      console.log('Length: ', this.trackers.value().length);
+    });
 
     this.isAddTrackerModalOpen.set(false);
   }
