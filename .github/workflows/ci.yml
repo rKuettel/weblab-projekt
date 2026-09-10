@@ -16,7 +16,6 @@ jobs:
       - uses: pnpm/setup@v2.1.0
         with:
           runtime: node@24
-          cache: true
           working-directory: frontend
 
       - name: Install dependencies
