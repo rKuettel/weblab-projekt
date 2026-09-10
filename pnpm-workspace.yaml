@@ -6,4 +6,5 @@ allowBuilds:
   "@parcel/watcher": true
   esbuild: true
   lmdb: true
+  mongodb-memory-server: true
   msgpackr-extract: true

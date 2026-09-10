@@ -1,4 +1,4 @@
-import { computed, DOCUMENT, inject, Service, signal } from '@angular/core';
+import { computed, Service, signal } from '@angular/core';
 import type { ThemeOption } from 'ngx-echarts';
 
 @Service()

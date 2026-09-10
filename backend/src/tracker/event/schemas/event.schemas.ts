@@ -1,13 +1,12 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Types } from 'mongoose';
+import mongoose, { HydratedDocument, Types } from 'mongoose';
 
 export type TrackerEventDocument = HydratedDocument<TrackerEvent>;
 
 @Schema()
 export class TrackerEvent {
   @Prop({
-    type: Types.ObjectId,
-    ref: 'Tracker',
+    type: mongoose.Schema.Types.ObjectId,
     required: true,
     index: true,
   })
@@ -18,7 +17,10 @@ export class TrackerEvent {
   })
   timestamp: Date;
 
-  @Prop({ required: true })
+  @Prop({
+    type: String,
+    required: true,
+  })
   type: TrackerEventType;
 
   @Prop({

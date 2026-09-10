@@ -15,4 +15,6 @@
 | 8. Sept   | 2.5h    | Migration von ngx-charts zu ngx-echarts anfgrund von Kompatabilitäts problemen mit Angular 22 |
 | 9. Sept   | 5.5h    | Erstellung von Unittests für Frontend Komponenten                                             |
 | 9. Sept   | 4h      | Löschen und editieren implementiert                                                           |
-| **Total** | 40h     |                                                                                               |
+| 10. Sept  | 2h      | Themeswitcher sowie echarts theme implementiert                                               |
+| 10. Sept  | 2h      | Erstellung von API tests                                                                      |
+| **Total** | 44h     |                                                                                               |
