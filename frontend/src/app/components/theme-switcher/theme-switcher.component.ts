@@ -1,4 +1,5 @@
-import { Component, DOCUMENT, inject, signal } from '@angular/core';
+import { Component, computed, DOCUMENT, inject, signal } from '@angular/core';
+import { ThemeService } from '../../services/theme.service';
 
 @Component({
   imports: [],
@@ -16,7 +17,7 @@ import { Component, DOCUMENT, inject, signal } from '@angular/core';
           type="checkbox"
           role="switch"
           (change)="toggleTheme()"
-          [value]="isDark()"
+          [checked]="isDark()"
           [attr.aria-label]="isDark() ? 'Switch to light theme' : 'Switch to dark theme'"
         />
         {{ isDark() ? '🌙' : '☀️' }}</label
@@ -25,19 +26,10 @@ import { Component, DOCUMENT, inject, signal } from '@angular/core';
   `,
 })
 export class ThemeSwitcherComponent {
-  private readonly document = inject(DOCUMENT);
-
-  readonly isDark = signal(this.document.documentElement.dataset['theme'] === 'dark');
+  private readonly themeService = inject(ThemeService);
+  readonly isDark = computed(() => this.themeService.picoCssTheme() === 'dark');
 
   toggleTheme(): void {
-    const element = this.document.documentElement;
-
-    if (this.isDark()) {
-      element.dataset['theme'] = 'light';
-      this.isDark.set(false);
-    } else {
-      element.dataset['theme'] = 'dark';
-      this.isDark.set(true);
-    }
+    this.themeService.toggle();
   }
 }

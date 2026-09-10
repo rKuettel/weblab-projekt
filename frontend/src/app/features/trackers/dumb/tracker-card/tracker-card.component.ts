@@ -17,15 +17,6 @@ import { TrackerSummaryComponent } from '../tracker-summary/tracker-summary.comp
       height: 100%;
       display: flex;
       flex-direction: column;
-      border: 1px solid #e5e7eb;
-      border-radius: 16px;
-      padding: 24px;
-
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-
-      transition:
-        transform 0.2s ease,
-        box-shadow 0.2s ease;
     }
     article {
       aspect-ratio: 1/1;
@@ -48,7 +39,7 @@ import { TrackerSummaryComponent } from '../tracker-summary/tracker-summary.comp
     }
   `,
   template: `
-    <div class="card">
+    <article class="card">
       <h3>{{ tracker().name }}</h3>
       <app-tracker-summary [summary]="tracker().summary"></app-tracker-summary>
       <div class="footer">
@@ -65,7 +56,7 @@ import { TrackerSummaryComponent } from '../tracker-summary/tracker-summary.comp
           [text]="'event.add' | translate"
         ></app-button>
       </div>
-    </div>
+    </article>
   `,
 })
 export class TrackerCardComponent {

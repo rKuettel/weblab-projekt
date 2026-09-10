@@ -1,5 +1,5 @@
 import type { EChartsCoreOption } from 'echarts/core';
-import { NgxEchartsDirective, provideEchartsCore } from 'ngx-echarts';
+import { NgxEchartsDirective, provideEchartsCore, ThemeOption } from 'ngx-echarts';
 import * as echarts from 'echarts/core';
 import { BarChart, HeatmapChart } from 'echarts/charts';
 import {
@@ -11,8 +11,9 @@ import {
   CalendarComponent,
 } from 'echarts/components';
 import { CanvasRenderer, SVGRenderer } from 'echarts/renderers';
-import { Component, computed, input } from '@angular/core';
+import { Component, computed, inject, input } from '@angular/core';
 import { DateRange } from '../date-range-selector/date-range-selector.component';
+import { ThemeService } from '../../services/theme.service';
 echarts.use([
   BarChart,
   GridComponent,
@@ -34,7 +35,12 @@ export interface CalendarHeatmapData {
   imports: [NgxEchartsDirective],
   providers: [provideEchartsCore({ echarts })],
   selector: 'app-calendar-heatmap',
-  template: `<div echarts [options]="options()" class="demo-chart"></div> `,
+  template: `<div
+    echarts
+    [options]="options()"
+    [theme]="themeService.echartsTheme()"
+    class="demo-chart"
+  ></div> `,
   styles: `
     :host {
       width: 100%;
@@ -64,6 +70,7 @@ export interface CalendarHeatmapData {
   `,
 })
 export class CalendarHeatmapComponent {
+  public readonly themeService = inject(ThemeService);
   readonly data = input<CalendarHeatmapData[]>([]);
   readonly dateRange = input.required<DateRange>();
   readonly aspectRatio = input<number>(2);
