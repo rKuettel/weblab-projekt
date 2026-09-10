@@ -1,4 +1,4 @@
-name: Angular CI
+name: Track Thing CI
 
 on:
   push:
@@ -16,16 +16,23 @@ jobs:
       - uses: pnpm/setup@v2.1.0
         with:
           runtime: node@24
-          working-directory: frontend
+          version: 11
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Build Frontend
+        run: pnpm build
         working-directory: frontend
 
-      - name: Test
+      - name: Test Frontend
         run: pnpm test --watch=false
         working-directory: frontend
 
-      - name: Build
+      - name: Build Backend
         run: pnpm build
-        working-directory: frontend
+        working-directory: backend
+
+      - name: Test Backend
+        run: pnpm test:e2e
+        working-directory: backend
