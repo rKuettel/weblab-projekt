@@ -7,13 +7,20 @@ import { TrackerDetailComponent } from './tracker-detail.component';
 import { TrackerApi } from '../../services/api/tracker.api';
 import { EventApi, EventsQueryParams } from '../../services/api/event.api';
 import { TrackerEvent } from '../../events.types';
-import { makeEvent, makeTracker } from '../../../../../../test/test-utils';
+import {
+  makeEvent,
+  makeCounterTracker,
+  makeCategoryTracker,
+} from '../../../../../../test/test-utils';
 import { By } from '@angular/platform-browser';
 import { EventListComponent } from '../../dumb/event-list/event-list.component';
 import { TrackerFormComponent } from '../../dumb/tracker-form/tracker-form.component';
 import { ButtonComponent } from '../../../../components/button/button.component';
 import { ConfirmDialogComponent } from '../../../../components/confirm-dialog/confirm-dialog.component';
 import { DateRangeSelectorComponent } from '../../../../components/date-range-selector/date-range-selector.component';
+import { Tracker } from '../../tracker.types';
+import { CounterTrackerStatsComponent } from '../../dumb/counter-tracker-stats/counter-tracker-stats.component';
+import { CategoryTrackerStatsComponent } from '../../dumb/category-tracker-stats/category-tracker-stats.component';
 
 const events: TrackerEvent[] = [
   makeEvent({ id: 'e1', timestamp: new Date('2024-06-10T10:00:00Z'), data: { delta: 10 } }),
@@ -32,7 +39,10 @@ function makeEventsResource(initialEvents: TrackerEvent[]) {
 }
 
 describe('TrackerDetail', () => {
-  async function setup(apiEvents: TrackerEvent[] = events) {
+  async function setup(
+    tracker: Tracker = makeCounterTracker({ id: '42', name: 'Steps', summary: { sum: 30 } }),
+    apiEvents: TrackerEvent[] = events,
+  ) {
     const getTrackerSpy = vi.fn();
     const getTrackerEventsSpy = vi.fn();
     const deleteEventSpy = vi.fn().mockReturnValue(of({}));
@@ -58,7 +68,8 @@ describe('TrackerDetail', () => {
           provide: TrackerApi,
           useValue: {
             getTracker: getTrackerSpy.mockReturnValue({
-              value: signal(makeTracker({ id: '42', name: 'Steps', summary: 30 })),
+              value: signal(tracker),
+              hasValue: signal(true),
               isLoading: signal(false),
               error: signal(undefined),
               set: trackerSet,
@@ -136,25 +147,26 @@ describe('TrackerDetail', () => {
     expect(eventlist?.events()).toHaveLength(events.length);
   });
 
-  it('should group events per day for the heatmap', async () => {
-    const { component } = await setup([
-      makeEvent({ id: 'e1', timestamp: new Date('2024-06-10T10:00:00Z'), data: { delta: 10 } }),
-      makeEvent({ id: 'e2', timestamp: new Date('2024-06-11T15:30:00Z'), data: { delta: 20 } }),
-      makeEvent({ id: 'e3', timestamp: new Date('2024-06-11T18:00:00Z'), data: { delta: 5 } }),
-    ]);
+  it('should only render counter stats when counter tracker', async () => {
+    const { fixture } = await setup(makeCounterTracker({ summary: { sum: 10 } }));
 
-    expect(component.heatMapData()).toEqual([
-      { date: new Date('2024-06-10'), value: 10 },
-      { date: new Date('2024-06-11'), value: 25 },
-    ]);
+    const counterTracker = fixture.debugElement.query(By.directive(CounterTrackerStatsComponent));
+    const categoryTracker = fixture.debugElement.query(By.directive(CategoryTrackerStatsComponent));
+
+    expect(counterTracker).toBeDefined();
+    expect(categoryTracker).toBeNull();
   });
 
-  it('should map events to bar chart data', async () => {
-    const { component } = await setup();
+  it('should only render category stats when category tracker', async () => {
+    const { fixture } = await setup(
+      makeCategoryTracker({ summary: [{ category: 'test', amount: 10 }] }),
+    );
 
-    const barData = component.barChartData();
-    expect(barData.map((d) => d.value)).toEqual([20, 10]);
-    barData.forEach((d) => expect(d.name).toBeTruthy());
+    const counterTracker = fixture.debugElement.query(By.directive(CounterTrackerStatsComponent));
+    const categoryTracker = fixture.debugElement.query(By.directive(CategoryTrackerStatsComponent));
+
+    expect(counterTracker).toBeNull();
+    expect(categoryTracker).toBeDefined();
   });
 
   it('should delete an event after confirmation and reload the data', async () => {
@@ -191,15 +203,17 @@ describe('TrackerDetail', () => {
     expect(navigateSpy).toHaveBeenCalledWith(['']);
   });
 
-  it('should patch only the name and close the dialog when updating the tracker', async () => {
+  it('should call api and close the dialog when updating the tracker', async () => {
     const { fixture, component, editTrackerSpy, trackerSet } = await setup();
 
     const form = fixture.debugElement.query(By.directive(TrackerFormComponent))
       .componentInstance as TrackerFormComponent;
-    expect(form.tracker()).toEqual(makeTracker({ id: '42', name: 'Steps', summary: 30 }));
+    expect(form.tracker()).toEqual(
+      makeCounterTracker({ id: '42', name: 'Steps', summary: { sum: 30 } }),
+    );
     expect(form.typeDisabled()).toBe(true);
 
-    const updated = makeTracker({ id: '42', name: 'Renamed' });
+    const updated = makeCounterTracker({ id: '42', name: 'Renamed' });
     form.onFormSubmit.emit(updated);
     editTrackerSpy.mockReturnValue(of(updated));
 

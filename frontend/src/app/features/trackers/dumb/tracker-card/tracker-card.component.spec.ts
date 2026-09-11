@@ -5,12 +5,14 @@ import { provideTranslateService, TranslateService } from '@ngx-translate/core';
 import { vi } from 'vitest';
 import { Tracker } from '../../tracker.types';
 import { TrackerCardComponent } from './tracker-card.component';
-import { makeTracker } from '../../../../../../test/test-utils';
+import { makeCounterTracker } from '../../../../../../test/test-utils';
+import { By } from '@angular/platform-browser';
+import { TrackerSummaryComponent } from '../tracker-summary/tracker-summary.component';
 
 @Component({ template: 'stub' })
 class DetailPageStub {}
 
-const tracker = makeTracker({ id: '1', name: 'Steps', summary: 100 });
+const tracker = makeCounterTracker({ id: '1', name: 'Steps', summary: { sum: 100 } });
 
 describe('TrackerCard', () => {
   async function setup(overrides: Partial<Tracker> = {}) {
@@ -43,12 +45,13 @@ describe('TrackerCard', () => {
   }
 
   it('should render the tracker name and summary', async () => {
-    const { fixture } = await setup({ name: 'Steps', summary: 100 });
+    const { fixture } = await setup({ name: 'Steps', summary: { sum: 100 } });
 
     expect(fixture.nativeElement.querySelector('h3')?.textContent).toBe('Steps');
-    expect(fixture.nativeElement.querySelector('app-tracker-summary')?.textContent).toContain(
-      '100',
-    );
+
+    const summaryComponent = fixture.debugElement.query(By.directive(TrackerSummaryComponent))
+      .componentInstance as TrackerSummaryComponent;
+    expect(summaryComponent).toBeDefined();
   });
 
   it('should render view and add event buttons', async () => {

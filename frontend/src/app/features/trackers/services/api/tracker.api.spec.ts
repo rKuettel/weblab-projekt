@@ -3,7 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TrackerApi } from './tracker.api';
 import { CreateTracker, Tracker } from '../../tracker.types';
-import { makeTracker } from '../../../../../../test/test-utils';
+import { makeCategoryTracker, makeCounterTracker } from '../../../../../../test/test-utils';
 
 describe('TrackerApi', () => {
   let service: TrackerApi;
@@ -29,7 +29,7 @@ describe('TrackerApi', () => {
       const request = httpTesting.expectOne((req) => req.url === 'api/tracker/42');
       expect(request.request.method).toBe('GET');
 
-      const tracker = makeTracker({ id: '42', name: 'Steps' });
+      const tracker = makeCounterTracker({ id: '42', name: 'Steps' });
       request.flush(tracker);
       await TestBed.inject(ApplicationRef).whenStable();
 
@@ -47,7 +47,10 @@ describe('TrackerApi', () => {
 
       const request = httpTesting.expectOne((req) => req.url === 'api/tracker');
       expect(request.request.method).toBe('GET');
-      request.flush([makeTracker({ id: '1' }), makeTracker({ id: '2', name: 'Water' })]);
+      request.flush([
+        makeCounterTracker({ id: '1' }),
+        makeCategoryTracker({ id: '2', name: 'Water' }),
+      ]);
       await TestBed.inject(ApplicationRef).whenStable();
     });
   });
@@ -55,7 +58,7 @@ describe('TrackerApi', () => {
   describe('createTracker', () => {
     it('should post a new tracker and emit the created tracker', async () => {
       const newTracker: CreateTracker = { name: 'Steps', type: 'counter' };
-      const created = makeTracker({ id: '7', name: 'Steps' });
+      const created = makeCounterTracker({ id: '7', name: 'Steps' });
 
       const emitted: Tracker[] = [];
       service.createTracker(newTracker).subscribe((t) => emitted.push(t));
@@ -74,7 +77,7 @@ describe('TrackerApi', () => {
 
   describe('editTracker', () => {
     it('should patch the tracker and emit the updated tracker', async () => {
-      const updated = makeTracker({ id: '42', name: 'Renamed' });
+      const updated = makeCounterTracker({ id: '42', name: 'Renamed' });
 
       const emitted: Tracker[] = [];
       service.editTracker('42', { name: 'Renamed' }).subscribe((t) => emitted.push(t));

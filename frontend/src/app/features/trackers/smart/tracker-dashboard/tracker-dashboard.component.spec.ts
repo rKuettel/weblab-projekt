@@ -3,7 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { provideTranslateService, TranslateService } from '@ngx-translate/core';
 import { TrackerDashboardComponent } from './tracker-dashboard.component';
 import { Tracker, TRACKER_TYPES } from '../../tracker.types';
-import { makeTracker } from '../../../../../../test/test-utils';
+import { makeCategoryTracker, makeCounterTracker } from '../../../../../../test/test-utils';
 import { provideHttpClient } from '@angular/common/http';
 import { TrackerApi } from '../../services/api/tracker.api';
 import { signal } from '@angular/core';
@@ -15,6 +15,7 @@ import { of } from 'rxjs';
 import { EventApi } from '../../services/api/event.api';
 import { EventFormComponent } from '../../dumb/event-form/event-form.component';
 import { CreateTrackerEvent } from '../../events.types';
+import { DialogComponent } from '../../../../components/dialog/dialog.component';
 
 const translations = {
   tracker: {
@@ -23,8 +24,12 @@ const translations = {
 };
 
 const trackers = [
-  makeTracker({ id: '1', name: 'Steps', summary: 100 }),
-  makeTracker({ id: '2', name: 'Water', summary: 50 }),
+  makeCounterTracker({ id: '1', name: 'Steps', summary: { sum: 100 } }),
+  makeCategoryTracker({
+    id: '2',
+    name: 'Category',
+    summary: [{ category: 'water', amount: 50 }],
+  }),
 ];
 
 describe('TrackerDashboard', () => {
@@ -83,7 +88,7 @@ describe('TrackerDashboard', () => {
     const cards = fixture.nativeElement.querySelectorAll('app-tracker-card');
     expect(cards).toHaveLength(2);
     expect(cards[0].querySelector('h3')?.textContent).toBe('Steps');
-    expect(cards[1].querySelector('h3')?.textContent).toBe('Water');
+    expect(cards[1].querySelector('h3')?.textContent).toBe('Category');
     expect(cards[0].querySelector('app-tracker-summary')?.textContent).toContain('100');
   });
 
@@ -145,9 +150,16 @@ describe('TrackerDashboard', () => {
     card?.onAddEventClick.emit(card.tracker().id);
     fixture.detectChanges();
 
-    const dialogs = fixture.nativeElement.querySelectorAll('dialog');
-    expect(dialogs[0].open).toBe(false);
-    expect(dialogs[1].open).toBe(true);
+    const dialogs = fixture.debugElement
+      .queryAll(By.directive(DialogComponent))
+      .map((d) => d.componentInstance as DialogComponent);
+    expect(dialogs[0].open()).toBe(false);
+    expect(dialogs[1].open()).toBe(true);
+    expect(dialogs[1].title()).toContain('Steps');
+
+    const form = fixture.debugElement.query(By.directive(EventFormComponent))
+      .componentInstance as EventFormComponent;
+    expect(form?.trackerType()).toBe('counter');
   });
 
   it('should add an event and update the tracker', async () => {
@@ -155,14 +167,8 @@ describe('TrackerDashboard', () => {
     const eventForm = fixture.debugElement.query(By.directive(EventFormComponent))
       .componentInstance as EventFormComponent;
 
-    fixture.componentInstance.currentTracker.set({
-      id: 'test-id',
-      name: 'Test',
-      type: TRACKER_TYPES.counter,
-      summary: 0,
-    });
+    fixture.componentInstance.currentTracker.set(makeCounterTracker({ id: 'test-id' }));
     const eventToAdd: CreateTrackerEvent = {
-      type: TRACKER_TYPES.counter,
       timestamp: new Date(),
       data: {
         delta: 10,

@@ -1,6 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateEventDto } from './dto/create-event.dto.js';
-import { Tracker } from '../schemas/tracker.schema.js';
+import {
+  CategoryTrackerSummary,
+  CounterTrackerSummary,
+  Tracker,
+  TrackerDocument,
+} from '../schemas/tracker.schema.js';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { TrackerEvent } from './schemas/event.schemas.js';
@@ -14,12 +19,16 @@ export class EventService {
   ) {}
 
   async create(trackerId: string, createEventDto: CreateEventDto) {
+    const tracker = await this.trackerModel.findById(trackerId).exec();
+    if (!tracker) {
+      throw new NotFoundException(`Tracker with id ${trackerId} not found`);
+    }
     const event = new this.eventModel({
       trackerId,
       ...createEventDto,
     });
     await event.save();
-    return this.refreshSummary(trackerId);
+    return this.refreshSummary(tracker);
   }
 
   async findInRange(trackerId: string, from?: Date, to?: Date) {
@@ -34,17 +43,36 @@ export class EventService {
   }
 
   async remove(trackerId: string, id: string) {
+    const tracker = await this.trackerModel.findById(trackerId).exec();
+    if (!tracker) {
+      throw new NotFoundException(`Tracker with id ${trackerId} not found`);
+    }
     const event = await this.eventModel.findByIdAndDelete(id).exec();
     if (!event) {
       throw new NotFoundException(`Event with id ${id} not found`);
     }
-    if (event.type !== 'counter') {
-      throw new Error('Unkown event type');
-    }
-    return this.refreshSummary(trackerId);
+    return this.refreshSummary(tracker);
   }
 
-  private async refreshSummary(trackerId: string) {
+  private async refreshSummary(tracker: TrackerDocument) {
+    let updatedSummary;
+
+    switch (tracker.type) {
+      case 'counter':
+        updatedSummary = await this.calculateCounterSummary(tracker.id);
+      case 'category':
+        updatedSummary = await this.calculateCategorySummary(tracker.id);
+    }
+
+    tracker.summary = updatedSummary;
+    tracker.markModified('summary');
+
+    return await tracker.save();
+  }
+
+  private async calculateCounterSummary(
+    trackerId: string,
+  ): Promise<CounterTrackerSummary> {
     const [result] = await this.eventModel
       .aggregate([
         { $match: { trackerId: new ObjectId(trackerId) } },
@@ -57,14 +85,29 @@ export class EventService {
       ])
       .exec();
 
-    return await this.trackerModel.findByIdAndUpdate(
-      trackerId,
+    return {
+      sum: result?.sum ?? 0,
+    };
+  }
+  private async calculateCategorySummary(
+    trackerId: string,
+  ): Promise<CategoryTrackerSummary> {
+    const rows = await this.eventModel.aggregate([
+      { $match: { trackerId: new ObjectId(trackerId) } },
       {
-        summary: result?.sum ?? 0,
+        $group: {
+          _id: '$data.category',
+          amount: { $sum: '$data.amount' },
+        },
       },
       {
-        returnDocument: 'after',
+        $project: {
+          _id: 0,
+          category: '$_id',
+          amount: 1,
+        },
       },
-    );
+    ]);
+    return rows ?? {};
   }
 }

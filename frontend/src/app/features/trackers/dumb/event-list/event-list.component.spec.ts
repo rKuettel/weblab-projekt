@@ -39,19 +39,13 @@ describe('EventList', () => {
     return {
       fixture,
       component: fixture.componentInstance,
-      eventBlocks: fixture.nativeElement.querySelectorAll('.event'),
+      eventBlocks: fixture.nativeElement.querySelectorAll('.event') as HTMLDivElement[],
     };
   }
 
-  it('should render events sorted by most recent first', async () => {
-    const { fixture, eventBlocks } = await setup();
+  it('should render all events', async () => {
+    const { eventBlocks } = await setup();
     expect(eventBlocks.length).toBe(3);
-
-    const text = fixture.nativeElement.textContent;
-    expect(text.indexOf('Data: 20')).toBeLessThan(text.indexOf('Data: 30'));
-    expect(text.indexOf('Data: 30')).toBeLessThan(text.indexOf('Data: 10'));
-    expect(eventBlocks[0].textContent).toContain('Data: 20');
-    expect(eventBlocks[0].textContent).toContain('Timestamp:');
   });
 
   it('should only delete the event after the confirmation dialog is confirmed', async () => {

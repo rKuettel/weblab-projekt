@@ -1,4 +1,4 @@
-import { Component, computed, input, output } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { Tracker } from '../../tracker.types';
 import { ButtonComponent } from '../../../../components/button/button.component';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -11,26 +11,18 @@ import { TrackerSummaryComponent } from '../tracker-summary/tracker-summary.comp
   styles: `
     :host {
       aspect-ratio: 1/1;
+      min-height: 0;
+      display: flex;
+      align-items: stretch;
+      flex-direction: column;
     }
+
     .card {
       aspect-ratio: 1/1;
-      height: 100%;
+      min-height: 0;
       display: flex;
+      align-items: stretch;
       flex-direction: column;
-    }
-    article {
-      aspect-ratio: 1/1;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-    }
-    .content {
-      container-type: inline-size;
-      height: 100%;
-
-      display: flex;
-      align-items: center;
-      justify-content: center;
     }
 
     .footer {
@@ -41,7 +33,7 @@ import { TrackerSummaryComponent } from '../tracker-summary/tracker-summary.comp
   template: `
     <article class="card">
       <h3>{{ tracker().name }}</h3>
-      <app-tracker-summary [summary]="tracker().summary"></app-tracker-summary>
+      <app-tracker-summary [tracker]="tracker()"></app-tracker-summary>
       <div class="footer">
         <app-button
           [fullWidth]="true"

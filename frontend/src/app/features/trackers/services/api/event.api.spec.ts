@@ -3,7 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { EventApi } from './event.api';
 import { Tracker } from '../../tracker.types';
-import { makeTracker } from '../../../../../../test/test-utils';
+import { makeCounterTracker } from '../../../../../../test/test-utils';
 
 describe('EventApi', () => {
   let service: EventApi;
@@ -73,10 +73,9 @@ describe('EventApi', () => {
 
   describe('addEvent', () => {
     it('should post the event and emit the updated tracker', async () => {
-      const tracker = makeTracker({ id: '42', summary: 55 });
+      const tracker = makeCounterTracker({ id: '42', summary: { sum: 55 } });
       const event = {
         timestamp: new Date('2024-02-01T09:00:00Z'),
-        type: 'counter',
         data: { delta: 5 },
       };
 

@@ -17,9 +17,9 @@ import { TranslatePipe } from '@ngx-translate/core';
       event of [...this.events()].sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
       track event.id
     ) {
-      <div class="event">
+      <div class="event" [attr.data-testid]="'event' + event.id">
         <p>Timestamp: {{ event.timestamp }}</p>
-        <p>Data: {{ event.data.delta }}</p>
+        <p>Data: {{ this.toJson(event.data) }}</p>
         <app-button
           (clicked)="eventIdToDelete.set(event.id)"
           variant="secondary"
@@ -52,5 +52,9 @@ export class EventListComponent {
       this.onDelete.emit(id);
       this.eventIdToDelete.set(undefined);
     }
+  }
+
+  toJson(test: any): string {
+    return JSON.stringify(test);
   }
 }

@@ -69,8 +69,8 @@ describe('tracker API (e2e)', () => {
 
     it('lists all trackers', async () => {
       await trackers.insertMany([
-        { name: 'Steps', type: 'counter', summary: 10 },
-        { name: 'Mood', type: 'category', summary: 0 },
+        { name: 'Steps', type: 'counter', summary: { sum: 10 } },
+        { name: 'Mood', type: 'category', summary: { sum: 0 } },
       ]);
 
       const response = await request(app.getHttpServer())
@@ -104,7 +104,7 @@ describe('tracker API (e2e)', () => {
         _id: id,
         name: 'Steps',
         type: 'counter',
-        summary: 10,
+        summary: { sum: 10 },
       });
 
       const response = await request(app.getHttpServer())
@@ -136,7 +136,7 @@ describe('tracker API (e2e)', () => {
         _id: id,
         name: 'Steps',
         type: 'counter',
-        summary: 10,
+        summary: { sum: 10 },
       });
 
       const response = await request(app.getHttpServer())
@@ -167,19 +167,19 @@ describe('tracker API (e2e)', () => {
         _id: id,
         name: 'Steps',
         type: 'counter',
-        summary: 20,
+        summary: {
+          sum: 10,
+        },
       });
       await events.insertMany([
         {
           trackerId: id,
           timestamp: new Date('2024-01-01T01:00:00.000Z'),
-          type: 'counter',
           data: { delta: 10 },
         },
         {
           trackerId: id,
           timestamp: new Date('2024-01-01T02:00:00.000Z'),
-          type: 'counter',
           data: { delta: 10 },
         },
       ]);

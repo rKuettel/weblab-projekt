@@ -48,7 +48,9 @@ describe('tracker event API (e2e)', () => {
       _id,
       name: 'Steps',
       type: 'counter',
-      summary: 0,
+      summary: {
+        sum: 0,
+      },
     });
     return _id;
   }
@@ -63,7 +65,6 @@ describe('tracker event API (e2e)', () => {
       _id,
       trackerId,
       timestamp,
-      type: 'counter',
       data: { delta },
     });
     return _id;
@@ -77,7 +78,6 @@ describe('tracker event API (e2e)', () => {
         .post(`/tracker/${trackerId}/event`)
         .send({
           timestamp: '2024-01-01T02:00:00.000Z',
-          type: 'counter',
           data: { delta: 5 },
         })
         .expect(201);
@@ -85,7 +85,6 @@ describe('tracker event API (e2e)', () => {
       expect(response.body).toEqual({
         id: String(trackerId),
         name: 'Steps',
-        type: 'counter',
         summary: 5,
       });
 

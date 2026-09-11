@@ -1,40 +1,32 @@
-import { Component, computed, input } from '@angular/core';
+import { Component, input } from '@angular/core';
+import { Tracker } from '../../tracker.types';
+import { BigNumberComponent } from '../../../../components/big-number/big-number.component';
+import { PieChartComponent } from '../../../../components/charts/pie-chart/pie-chart.component';
 
 @Component({
-  imports: [],
+  imports: [BigNumberComponent, PieChartComponent],
   selector: 'app-tracker-summary',
   styles: `
     :host {
-      container-type: inline-size;
-      height: 100%;
-
       display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .summary {
-      /* Using Mono-Space Fonts defined in picocss: https://github.com/picocss/pico/blob/main/css/pico.jade.css */
-      font-family:
-        ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
-      line-height: 1;
-      font-weight: 700;
-      display: block;
-      white-space: nowrap;
+      justify-content: stretch;
+      align-items: stretch;
+      min-height: 0;
+      flex: 1;
     }
   `,
   template: `
-    <span class="summary" [style.font-size]="fontSize()">
-      {{ summary() }}
-    </span>
+    @let tracker = this.tracker();
+    @switch (tracker.type) {
+      @case ('counter') {
+        <app-big-number [number]="tracker.summary.sum"></app-big-number>
+      }
+      @case ('category') {
+        <app-pie-chart [data]="{ source: tracker.summary }"></app-pie-chart>
+      }
+    }
   `,
 })
 export class TrackerSummaryComponent {
-  readonly summary = input.required<number>();
-
-  fontSize = computed(() => {
-    const digits = this.summary().toString().length;
-    // Divide by 0.6 since this is the recommended ratio between height and width of a monospaced font
-    const size = Math.min(100 / digits / 0.6, 50);
-    return `${size}cqw`;
-  });
+  readonly tracker = input.required<Tracker>();
 }

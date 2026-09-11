@@ -5,18 +5,20 @@ import { Field, FormField } from '@angular/forms/signals';
   selector: 'app-input',
   imports: [FormField],
   template: `
-    <label>
-      {{ this.label() }}
-      <input
-        [type]="this.type()"
-        [formField]="this.formField()"
-        [ariaInvalid]="formField()().invalid()"
-        (change)="change.emit()"
-      />
-      @for (error of formField()().errors(); track error) {
-        <small [attr.data-testid]="'error-' + this.label()">{{ error.message }}</small>
-      }
-    </label>
+    @if (!this.formField()().hidden()) {
+      <label>
+        {{ this.label() }}
+        <input
+          [type]="this.type()"
+          [formField]="this.formField()"
+          [ariaInvalid]="formField()().invalid()"
+          (change)="change.emit()"
+        />
+        @for (error of formField()().errors(); track error) {
+          <small [attr.data-testid]="'error-' + this.label()">{{ error.message }}</small>
+        }
+      </label>
+    }
   `,
   styles: `
     .error {

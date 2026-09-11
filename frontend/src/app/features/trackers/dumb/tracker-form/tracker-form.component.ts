@@ -1,5 +1,5 @@
-import { Component, computed, input, linkedSignal, output, signal } from '@angular/core';
-import { disabled, form, FormField, required } from '@angular/forms/signals';
+import { Component, input, linkedSignal, output } from '@angular/core';
+import { disabled, form, FormField } from '@angular/forms/signals';
 import { CreateTracker, DEFAULT_TRACKER, TRACKER_TYPES } from '../../tracker.types';
 import { InputComponent } from '../../../../components/input/input.component';
 import { TitleCasePipe } from '@angular/common';

@@ -1,35 +1,34 @@
-import { Component, computed, inject, Signal, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { TrackerApi } from '../../services/api/tracker.api';
 import { EventApi } from '../../services/api/event.api';
 import { ActivatedRoute, Router } from '@angular/router';
 import { EventListComponent } from '../../dumb/event-list/event-list.component';
-import { TrackerSummaryComponent } from '../../dumb/tracker-summary/tracker-summary.component';
 import {
   DateRange,
   DateRangeSelectorComponent,
   daysAgo,
 } from '../../../../components/date-range-selector/date-range-selector.component';
-import { CalendarHeatmapComponent } from '../../../../components/calendar-heatmap/calendar-heatmap.component';
-import { BarChartComponent } from '../../../../components/bar-chart/bar-chart.component';
 import { ButtonComponent } from '../../../../components/button/button.component';
 import { ConfirmDialogComponent } from '../../../../components/confirm-dialog/confirm-dialog.component';
 import { TranslatePipe } from '@ngx-translate/core';
 import { DialogComponent } from '../../../../components/dialog/dialog.component';
 import { TrackerFormComponent } from '../../dumb/tracker-form/tracker-form.component';
 import { CreateTracker } from '../../tracker.types';
+import { CategoryTrackerEvent, CounterTrackerEvent } from '../../events.types';
+import { CounterTrackerStatsComponent } from '../../dumb/counter-tracker-stats/counter-tracker-stats.component';
+import { CategoryTrackerStatsComponent } from '../../dumb/category-tracker-stats/category-tracker-stats.component';
 
 @Component({
   imports: [
     EventListComponent,
     DateRangeSelectorComponent,
-    TrackerSummaryComponent,
-    CalendarHeatmapComponent,
-    BarChartComponent,
     ButtonComponent,
     ConfirmDialogComponent,
     TranslatePipe,
     DialogComponent,
     TrackerFormComponent,
+    CounterTrackerStatsComponent,
+    CategoryTrackerStatsComponent,
   ],
   selector: 'app-tracker-detail',
   styles: `
@@ -69,10 +68,6 @@ import { CreateTracker } from '../../tracker.types';
       grid-template-columns: 1fr 1fr;
       align-items: start;
       align-content: start;
-    }
-
-    .heatmap {
-      grid-column: span 2;
     }
 
     /* @media screen and (min-width: 768px) { */
@@ -121,39 +116,25 @@ import { CreateTracker } from '../../tracker.types';
         </article>
       }
 
-      <div class="stats">
-        <article [aria-busy]="this.tracker.isLoading()">
-          <h3>Total</h3>
-          @if (this.trackerEvents.hasValue()) {
-            <app-tracker-summary
-              [summary]="this.trackerEvents.value().reduce((acc, e) => (acc += e.data.delta), 0)"
-            ></app-tracker-summary>
+      @if (this.trackerEvents.hasValue() && this.tracker.hasValue()) {
+        @let tracker = this.tracker.value();
+        @switch (tracker.type) {
+          @case ('counter') {
+            <app-counter-tracker-stats
+              [trackerEvents]="this.counterTrackerEvents()"
+              [tracker]="tracker"
+              [dateRange]="this.dateRangeChanged()"
+            ></app-counter-tracker-stats>
           }
-        </article>
-        <article [aria-busy]="this.tracker.isLoading()">
-          <h3>Avg Per Day</h3>
-          @if (this.trackerEvents.hasValue()) {
-            <app-tracker-summary
-              [summary]="this.trackerEvents.value().reduce((acc, e) => (acc += e.data.delta), 0)"
-            ></app-tracker-summary>
+          @case ('category') {
+            <app-category-tracker-stats
+              [trackerEvents]="this.categoryTrackerEvents()"
+              [trackerSummary]="tracker.summary"
+              [dateRange]="this.dateRangeChanged()"
+            ></app-category-tracker-stats>
           }
-        </article>
-        <article class="heatmap" [aria-busy]="this.trackerEvents.isLoading()">
-          @if (this.heatMapData()) {
-            <h3>Heatmap</h3>
-            <app-calendar-heatmap [data]="this.heatMapData()" [dateRange]="this.dateRangeChanged()">
-              ></app-calendar-heatmap
-            >
-          }
-        </article>
-
-        <article class="heatmap" [aria-busy]="this.trackerEvents.isLoading()">
-          @if (this.heatMapData()) {
-            <h3>Bar Chart</h3>
-            <app-bar-chart [data]="this.barChartData()"> ></app-bar-chart>
-          }
-        </article>
-      </div>
+        }
+      }
     </div>
     <app-confirm-dialog
       [title]="'tracker.confirmDelete' | translate"
@@ -213,40 +194,11 @@ export class TrackerDetailComponent {
   public tracker = this.trackerApi.getTracker(this.trackerId);
   public trackerEvents = this.eventApi.getTrackerEvents(this.trackerId, this.dateRangeTransformed);
 
-  public heatMapData = computed(() => {
-    const events = this.trackerEvents.value();
-    const grouped = events?.reduce(
-      (acc, event) => {
-        const date = event.timestamp.toISOString().split('T')[0];
-        if (!acc[date]) {
-          acc[date] = event.data.delta;
-        } else {
-          acc[date] += event.data.delta;
-        }
-        return acc;
-      },
-      {} as Record<string, number>,
-    );
-    if (!grouped) {
-      return [];
-    }
-    return Object.entries(grouped).map(([date, sum]) => {
-      return {
-        date: new Date(date),
-        value: sum,
-      };
-    });
+  public counterTrackerEvents = computed(() => {
+    return this.trackerEvents.value() as CounterTrackerEvent[];
   });
-
-  public barChartData = computed(() => {
-    // Copy before reversing so the resource's array is not mutated.
-    const events = [...this.trackerEvents.value()].reverse();
-    return events.map((e) => {
-      return {
-        value: e.data.delta,
-        name: e.timestamp.toDateString(),
-      };
-    });
+  public categoryTrackerEvents = computed(() => {
+    return this.trackerEvents.value() as CategoryTrackerEvent[];
   });
 
   constructor() {

@@ -1,6 +1,6 @@
 import { Component, input, linkedSignal, output } from '@angular/core';
 import { InputComponent } from '../input/input.component';
-import { form, FormField, validate } from '@angular/forms/signals';
+import { form, FormField, required, validate } from '@angular/forms/signals';
 import { translate, TranslatePipe } from '@ngx-translate/core';
 
 @Component({
@@ -39,17 +39,19 @@ export class DateRangeSelectorComponent {
   private invalidDateRangeMessage = translate('dateRangeSelector.invalidDateRange');
 
   dateRangeForm = form(this.dateRangeFormModel, (schema) => {
-    validate(schema.to, ({ value, valueOf }) => {
-      if (value() < valueOf(schema.from)) {
-        console.log('invalidDateRange');
-        return {
-          kind: 'invalidDateRange',
-          message: this.invalidDateRangeMessage(),
-        };
-      }
+    (required(schema.from),
+      required(schema.to),
+      validate(schema.to, ({ value, valueOf }) => {
+        if (value() < valueOf(schema.from)) {
+          console.log('invalidDateRange');
+          return {
+            kind: 'invalidDateRange',
+            message: this.invalidDateRangeMessage(),
+          };
+        }
 
-      return null;
-    });
+        return null;
+      }));
   });
 
   dateUpdated() {
@@ -71,8 +73,8 @@ export class DateRangeSelectorComponent {
     const from = range.from.trim();
     const to = range.to.trim();
     return {
-      from: from !== '' ? new Date(from) : undefined,
-      to: to !== '' ? new Date(to) : undefined,
+      from: new Date(from),
+      to: new Date(to),
     };
   }
 }
@@ -81,8 +83,8 @@ function toDateString(date?: Date): string {
 }
 
 export interface DateRange {
-  from?: Date;
-  to?: Date;
+  from: Date;
+  to: Date;
 }
 interface DateRangeFormModel {
   from: string;

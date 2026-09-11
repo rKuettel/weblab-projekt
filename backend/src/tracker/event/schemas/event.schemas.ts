@@ -18,12 +18,6 @@ export class TrackerEvent {
   timestamp: Date;
 
   @Prop({
-    type: String,
-    required: true,
-  })
-  type: TrackerEventType;
-
-  @Prop({
     type: Types.Map,
     required: true,
   })
@@ -38,8 +32,7 @@ export class CounterEvent {
 
 export class CategoryEvent {
   category: string;
+  amount: number;
 }
 
 export const TrackerEventSchema = SchemaFactory.createForClass(TrackerEvent);
-
-export type TrackerEventType = 'counter';

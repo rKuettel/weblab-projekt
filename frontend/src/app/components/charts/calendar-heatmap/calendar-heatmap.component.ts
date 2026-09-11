@@ -10,10 +10,10 @@ import {
   VisualMapComponent,
   CalendarComponent,
 } from 'echarts/components';
-import { CanvasRenderer, SVGRenderer } from 'echarts/renderers';
+import { SVGRenderer } from 'echarts/renderers';
 import { Component, computed, inject, input } from '@angular/core';
-import { DateRange } from '../date-range-selector/date-range-selector.component';
-import { ThemeService } from '../../services/theme.service';
+import { DateRange } from '../../date-range-selector/date-range-selector.component';
+import { ThemeService } from '../../../services/theme.service';
 echarts.use([
   BarChart,
   GridComponent,
@@ -88,8 +88,6 @@ export class CalendarHeatmapComponent {
         dateRange.to.toISOString().split('T')[0],
       ];
     }
-
-    console.log('DateRangeEchart: ', dateRangeEchart);
 
     const data = this.data().map((d) => {
       return [d.date.toISOString().split('T')[0], d.value];

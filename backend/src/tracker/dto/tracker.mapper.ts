@@ -6,6 +6,6 @@ export function toTrackerDto(tracker: TrackerDocument): TrackerDto {
     id: tracker.id,
     name: tracker.name,
     type: tracker.type,
-    summary: tracker.summary ?? 0,
+    summary: tracker.summary,
   };
 }

@@ -1,16 +1,21 @@
 import { inputBinding, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { TrackerSummaryComponent } from './tracker-summary.component';
+import { makeCategoryTracker, makeCounterTracker } from '../../../../../../test/test-utils';
+import { Tracker } from '../../tracker.types';
+import { By } from '@angular/platform-browser';
+import { BigNumberComponent } from '../../../../components/big-number/big-number.component';
+import { PieChartComponent } from '../../../../components/charts/pie-chart/pie-chart.component';
 
 describe('TrackerSummary', () => {
-  async function setup(summary: number) {
+  async function setup(tracker: Tracker) {
     TestBed.resetTestingModule();
     await TestBed.configureTestingModule({
       imports: [TrackerSummaryComponent],
     }).compileComponents();
 
     const fixture = TestBed.createComponent(TrackerSummaryComponent, {
-      bindings: [inputBinding('summary', signal(summary))],
+      bindings: [inputBinding('tracker', signal(tracker))],
     });
     fixture.detectChanges();
 
@@ -21,33 +26,22 @@ describe('TrackerSummary', () => {
     };
   }
 
-  it('should render the summary value', async () => {
-    const { summarySpan } = await setup(42);
+  it('should render big number when counter tracker', async () => {
+    const { fixture } = await setup(makeCounterTracker({ summary: { sum: 10 } }));
 
-    expect(summarySpan.textContent?.trim()).toBe('42');
+    const bigNumber = fixture.debugElement.query(By.directive(BigNumberComponent));
+    expect(bigNumber).toBeDefined();
+    const bigNumberComponent = bigNumber.componentInstance as BigNumberComponent;
+    expect(bigNumberComponent.number()).toBe(10);
   });
 
-  it('should apply the computed font size to the summary', async () => {
-    const { component, summarySpan } = await setup(42);
+  it('should render pie chart stats when category tracker', async () => {
+    const { fixture } = await setup(
+      makeCategoryTracker({ summary: [{ category: 'test', amount: 10 }] }),
+    );
 
-    expect(summarySpan.style.fontSize).toBe(component.fontSize());
-  });
+    const pieChart = fixture.debugElement.query(By.directive(PieChartComponent));
 
-  it('caps the font size at 50cqw for short numbers', async () => {
-    for (const summary of [0, 7, 42, 123]) {
-      const { component } = await setup(summary);
-      expect(parseFloat(component.fontSize())).toBe(50);
-    }
-  });
-
-  it('scales the font size down for long numbers', async () => {
-    for (const [summary, expected] of [
-      [1234, 100 / 4 / 0.6],
-      [12345, 100 / 5 / 0.6],
-    ] as const) {
-      const { component } = await setup(summary);
-      expect(parseFloat(component.fontSize())).toBeCloseTo(expected);
-      expect(component.fontSize().endsWith('cqw')).toBe(true);
-    }
+    expect(pieChart).toBeDefined();
   });
 });

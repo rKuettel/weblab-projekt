@@ -83,7 +83,10 @@ import { translate, TranslatePipe } from '@ngx-translate/core';
           [open]="isAddEventModalOpen()"
           (onClose)="this.currentTracker.set(undefined)"
         >
-          <app-event-form (onFormSubmit)="addEvent($event)"></app-event-form>
+          <app-event-form
+            [trackerType]="currentTracker()?.type ?? 'counter'"
+            (onFormSubmit)="addEvent($event)"
+          ></app-event-form>
         </app-dialog>
       </div>
     </div>

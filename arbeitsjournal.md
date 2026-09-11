@@ -17,4 +17,7 @@
 | 9. Sept   | 4h      | Löschen und editieren implementiert                                                           |
 | 10. Sept  | 2h      | Themeswitcher sowie echarts theme implementiert                                               |
 | 10. Sept  | 2h      | Erstellung von API tests                                                                      |
-| **Total** | 44h     |                                                                                               |
+| 11. Sept  | 3h      | Hinzufügn von Kategorien Trackern in Backend                                                  |
+| 12. Sept  | 5.5h    | Hinzufügen von Ketegorie Trackern im Frontend Trackers                                        |
+| 12. Sept  | 2h      | Anpassung Unittests im Frontend                                                               |
+| **Total** | 54.5h   |                                                                                               |

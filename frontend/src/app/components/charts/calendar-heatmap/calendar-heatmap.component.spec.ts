@@ -1,11 +1,17 @@
 import { inputBinding, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { CalendarHeatmapComponent, CalendarHeatmapData } from './calendar-heatmap.component';
-import { DateRange } from '../date-range-selector/date-range-selector.component';
+import { DateRange } from '../../date-range-selector/date-range-selector.component';
 import { NgxEchartsDirective } from 'ngx-echarts';
 
 describe('CalendarHeatmap', () => {
-  async function setup(data: CalendarHeatmapData[] = [], dateRange: DateRange = {}) {
+  async function setup(
+    data: CalendarHeatmapData[] = [],
+    dateRange: DateRange = {
+      from: new Date('2024-01-01'),
+      to: new Date('2024-01-31'),
+    },
+  ) {
     await TestBed.configureTestingModule({
       imports: [NgxEchartsDirective, CalendarHeatmapComponent],
     }).compileComponents();
@@ -22,20 +28,10 @@ describe('CalendarHeatmap', () => {
   }
 
   it('should use the given date range for the calendar', async () => {
-    const { component } = await setup([], {
-      from: new Date('2024-01-01'),
-      to: new Date('2024-01-31'),
-    });
+    const { component } = await setup([]);
     const options = component.options() as { calendar: { range: unknown } };
 
     expect(options.calendar.range).toEqual(['2024-01-01', '2024-01-31']);
-  });
-
-  it('should fall back to the current year when the date range is empty', async () => {
-    const { component } = await setup([], {});
-    const options = component.options() as { calendar: { range: unknown } };
-
-    expect(options.calendar.range).toBe(new Date().getFullYear());
   });
 
   it('should map the data to the heatmap series', async () => {

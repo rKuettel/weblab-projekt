@@ -58,9 +58,11 @@ describe('TrackerForm', () => {
     const typeLabel = fixture.nativeElement.querySelector('[for="type"');
     expect(typeLabel?.textContent).toContain('Type');
 
-    expect(typeSelect.options.length).toBe(1);
+    expect(typeSelect.options.length).toBe(2);
     expect(typeSelect.options[0].value).toBe('counter');
     expect(typeSelect.options[0].textContent).toBe('Counter');
+    expect(typeSelect.options[1].value).toBe('category');
+    expect(typeSelect.options[1].textContent).toBe('Category');
   });
 
   it('should keep the submit button disabled when form is invalid', async () => {

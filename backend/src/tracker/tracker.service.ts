@@ -3,7 +3,13 @@ import { CreateTrackerDto } from './dto/create-tracker.dto.js';
 import { UpdateTrackerDto } from './dto/update-tracker.dto.js';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Tracker } from './schemas/tracker.schema.js';
+import {
+  CategoryTrackerSummary,
+  CounterTrackerSummary,
+  Tracker,
+  TrackerSummary,
+  TrackerType,
+} from './schemas/tracker.schema.js';
 import { TrackerEvent } from './event/schemas/event.schemas.js';
 
 @Injectable()
@@ -14,7 +20,10 @@ export class TrackerService {
   ) {}
 
   create(createTrackerDto: CreateTrackerDto) {
-    const createdTracker = new this.trackerModel(createTrackerDto);
+    const createdTracker = new this.trackerModel({
+      ...createTrackerDto,
+      summary: this.getInitalSummary(createTrackerDto.type),
+    });
     return createdTracker.save();
   }
 
@@ -40,4 +49,19 @@ export class TrackerService {
     await tracker.deleteOne().exec();
     await this.eventModel.deleteMany({ trackerId: id }).exec();
   }
+
+  private getInitalSummary(trackerType: TrackerType): TrackerSummary {
+    switch (trackerType) {
+      case 'counter':
+        return DEFAULT_COUNTER_SUMMARY;
+      case 'category':
+        return DEFAULT_CATEGORY_SUMMARY;
+    }
+  }
 }
+
+const DEFAULT_COUNTER_SUMMARY: CounterTrackerSummary = {
+  sum: 0,
+};
+
+const DEFAULT_CATEGORY_SUMMARY: CategoryTrackerSummary = [];

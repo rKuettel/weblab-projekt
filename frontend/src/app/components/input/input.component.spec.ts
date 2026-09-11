@@ -1,6 +1,6 @@
 import { inputBinding, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { form, required } from '@angular/forms/signals';
+import { form, hidden, required } from '@angular/forms/signals';
 import { InputComponent } from './input.component';
 
 interface Model {
@@ -8,7 +8,10 @@ interface Model {
 }
 
 describe('Input', () => {
-  async function setup(props: Partial<{ label: string; type: string; name: string }> = {}) {
+  async function setup(
+    props: Partial<{ label: string; type: string; name: string }> = {},
+    ishidden: boolean = false,
+  ) {
     const label = props.label ?? 'Name';
     const type = props.type ?? 'text';
     const model = signal<Model>({ name: props.name ?? '' });
@@ -18,7 +21,10 @@ describe('Input', () => {
     }).compileComponents();
 
     const formRef = TestBed.runInInjectionContext(() =>
-      form(model, (schema) => required(schema.name, { message: 'Name is required' })),
+      form(model, (schema) => {
+        required(schema.name, { message: 'Name is required' });
+        hidden(schema.name, { when: ({}) => ishidden });
+      }),
     );
 
     const fixture = TestBed.createComponent(InputComponent<string>, {
@@ -65,5 +71,11 @@ describe('Input', () => {
       'false',
     );
     expect(fixture.nativeElement.querySelector('[data-testid="error-Name"')).toBeNull();
+  });
+
+  it('should not render when hidden', async () => {
+    const { fixture } = await setup(undefined, true);
+
+    expect(fixture.nativeElement.childElementCount).toBe(0);
   });
 });
