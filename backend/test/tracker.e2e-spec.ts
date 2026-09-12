@@ -42,8 +42,8 @@ describe('tracker API (e2e)', () => {
     await trackers.deleteMany();
   });
 
-  describe('', () => {
-    it('creates a tracker and returns it with a generated id', async () => {
+  describe('POST /tracker', () => {
+    it('creates a counter tracker and returns it with a generated id', async () => {
       const response = await request(app.getHttpServer())
         .post('/tracker')
         .send({ name: 'Steps', type: 'counter' })
@@ -54,7 +54,22 @@ describe('tracker API (e2e)', () => {
         id: response.body.id,
         name: 'Steps',
         type: 'counter',
-        summary: 0,
+        summary: { sum: 0 },
+      });
+    });
+
+    it('creates a category tracker and returns it with a generated id', async () => {
+      const response = await request(app.getHttpServer())
+        .post('/tracker')
+        .send({ name: 'Drinks', type: 'category' })
+        .expect(201);
+
+      expect(response.body.id).toMatch(/^[a-f0-9]{24}$/);
+      expect(response.body).toEqual({
+        id: response.body.id,
+        name: 'Drinks',
+        type: 'category',
+        summary: [],
       });
     });
   });
@@ -70,7 +85,7 @@ describe('tracker API (e2e)', () => {
     it('lists all trackers', async () => {
       await trackers.insertMany([
         { name: 'Steps', type: 'counter', summary: { sum: 10 } },
-        { name: 'Mood', type: 'category', summary: { sum: 0 } },
+        { name: 'Mood', type: 'category', summary: [] },
       ]);
 
       const response = await request(app.getHttpServer())
@@ -84,13 +99,13 @@ describe('tracker API (e2e)', () => {
             id: expect.any(String),
             name: 'Steps',
             type: 'counter',
-            summary: 10,
+            summary: { sum: 10 },
           }),
           expect.objectContaining({
             id: expect.any(String),
             name: 'Mood',
             type: 'category',
-            summary: 0,
+            summary: [],
           }),
         ]),
       );
@@ -114,7 +129,9 @@ describe('tracker API (e2e)', () => {
         id: String(id),
         name: 'Steps',
         type: 'counter',
-        summary: 10,
+        summary: {
+          sum: 10,
+        },
       });
     });
 
@@ -148,7 +165,7 @@ describe('tracker API (e2e)', () => {
         id: String(id),
         name: 'Daily Steps',
         type: 'counter',
-        summary: 10,
+        summary: { sum: 10 },
       });
     });
 

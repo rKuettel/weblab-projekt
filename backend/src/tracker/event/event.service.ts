@@ -5,6 +5,7 @@ import {
   CounterTrackerSummary,
   Tracker,
   TrackerDocument,
+  TrackerSummary,
 } from '../schemas/tracker.schema.js';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
@@ -55,19 +56,23 @@ export class EventService {
   }
 
   private async refreshSummary(tracker: TrackerDocument) {
-    let updatedSummary;
-
-    switch (tracker.type) {
-      case 'counter':
-        updatedSummary = await this.calculateCounterSummary(tracker.id);
-      case 'category':
-        updatedSummary = await this.calculateCategorySummary(tracker.id);
-    }
+    const updatedSummary = await this.calculateSummary(tracker);
 
     tracker.summary = updatedSummary;
     tracker.markModified('summary');
 
     return await tracker.save();
+  }
+
+  private async calculateSummary(
+    tracker: TrackerDocument,
+  ): Promise<TrackerSummary> {
+    switch (tracker.type) {
+      case 'counter':
+        return await this.calculateCounterSummary(tracker.id);
+      case 'category':
+        return await this.calculateCategorySummary(tracker.id);
+    }
   }
 
   private async calculateCounterSummary(
