@@ -1,8 +1,8 @@
 import { TestBed } from '@angular/core/testing';
 import { CategoryTrackerStatsComponent } from './category-tracker-stats.component';
-import { TrackerEvent } from '../../events.types';
-import { DateRange } from '../../../../components/date-range-selector/date-range-selector.component';
-import { CategoryTrackerSummary } from '../../tracker.types';
+import { TrackerEvent } from '../../../events.types';
+import { DateRange } from '../../../../../components/date-range-selector/date-range-selector.component';
+import { CategoryTrackerSummary } from '../../../tracker.types';
 import { provideTranslateService, TranslateService } from '@ngx-translate/core';
 import { inputBinding, signal } from '@angular/core';
 const DEFAULT_RANGE: DateRange = {

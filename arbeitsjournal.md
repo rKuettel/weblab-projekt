@@ -18,6 +18,7 @@
 | 10. Sept  | 2h      | Themeswitcher sowie echarts theme implementiert                                               |
 | 10. Sept  | 2h      | Erstellung von API tests                                                                      |
 | 11. Sept  | 3h      | Hinzufügn von Kategorien Trackern in Backend                                                  |
-| 12. Sept  | 5.5h    | Hinzufügen von Ketegorie Trackern im Frontend Trackers                                        |
-| 12. Sept  | 2h      | Anpassung Unittests nache Kategorien erweiterung                                              |
-| **Total** | 54.5h   |                                                                                               |
+| 11. Sept  | 5.5h    | Hinzufügen von Ketegorie Trackern im Frontend Trackers                                        |
+| 12. Sept  | 2h      | Anpassung Unittests nach Kategorien erweiterung                                               |
+| 13. Sept  | 1.5h    | Auslagerung von Events und Statisiken in seperate tabs auf der Detail Page                    |
+| **Total** | 56h     |                                                                                               |

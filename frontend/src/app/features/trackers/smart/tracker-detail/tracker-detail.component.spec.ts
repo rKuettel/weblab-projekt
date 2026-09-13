@@ -7,20 +7,17 @@ import { TrackerDetailComponent } from './tracker-detail.component';
 import { TrackerApi } from '../../services/api/tracker.api';
 import { EventApi, EventsQueryParams } from '../../services/api/event.api';
 import { TrackerEvent } from '../../events.types';
-import {
-  makeEvent,
-  makeCounterTracker,
-  makeCategoryTracker,
-} from '../../../../../../test/test-utils';
+import { makeEvent, makeCounterTracker } from '../../../../../../test/test-utils';
 import { By } from '@angular/platform-browser';
 import { EventListComponent } from '../../dumb/event-list/event-list.component';
 import { TrackerFormComponent } from '../../dumb/tracker-form/tracker-form.component';
 import { ButtonComponent } from '../../../../components/button/button.component';
 import { ConfirmDialogComponent } from '../../../../components/confirm-dialog/confirm-dialog.component';
-import { DateRangeSelectorComponent } from '../../../../components/date-range-selector/date-range-selector.component';
+import {
+  DateRange,
+  DateRangeSelectorComponent,
+} from '../../../../components/date-range-selector/date-range-selector.component';
 import { Tracker } from '../../tracker.types';
-import { CounterTrackerStatsComponent } from '../../dumb/counter-tracker-stats/counter-tracker-stats.component';
-import { CategoryTrackerStatsComponent } from '../../dumb/category-tracker-stats/category-tracker-stats.component';
 
 const events: TrackerEvent[] = [
   makeEvent({ id: 'e1', timestamp: new Date('2024-06-10T10:00:00Z'), data: { delta: 10 } }),
@@ -40,6 +37,8 @@ function makeEventsResource(initialEvents: TrackerEvent[]) {
 
 describe('TrackerDetail', () => {
   async function setup(
+    tab = 'stats',
+    dateRange: DateRange = { to: new Date(), from: new Date() },
     tracker: Tracker = makeCounterTracker({ id: '42', name: 'Steps', summary: { sum: 30 } }),
     apiEvents: TrackerEvent[] = events,
   ) {
@@ -59,8 +58,19 @@ describe('TrackerDetail', () => {
         {
           provide: ActivatedRoute,
           useValue: {
-            snapshot: { params: { id: '42' } },
+            snapshot: {
+              params: { id: '42' },
+            },
             params: of({ id: '42' }),
+            queryParamMap: of(
+              new Map(
+                Object.entries({
+                  tab: tab,
+                  from: dateRange.from.toISOString(),
+                  to: dateRange.to.toISOString(),
+                }),
+              ),
+            ),
           },
         },
         { provide: Router, useValue: { navigate: navigateSpy } },
@@ -123,23 +133,27 @@ describe('TrackerDetail', () => {
   }
 
   it('should request the tracker and its events by the route id', async () => {
-    const { getTrackerSpy, getTrackerEventsSpy } = await setup();
+    const dateRange = {
+      from: new Date(2026, 8, 8, 10, 12, 13),
+      to: new Date(2026, 8, 9, 9, 8, 7),
+    };
+    const { getTrackerSpy, getTrackerEventsSpy } = await setup('stats', dateRange);
 
     expect(getTrackerSpy).toHaveBeenCalledOnce();
     expect((getTrackerSpy.mock.calls[0][0] as Signal<string>)()).toBe('42');
 
     expect(getTrackerEventsSpy).toHaveBeenCalledOnce();
-    const [trackerId, dateRange] = getTrackerEventsSpy.mock.calls[0] as [
+    const [trackerId, usedDateRange] = getTrackerEventsSpy.mock.calls[0] as [
       Signal<string>,
       Signal<EventsQueryParams>,
     ];
     expect(trackerId()).toBe('42');
-    expect(dateRange().from).toBeInstanceOf(Date);
-    expect(dateRange().to?.getTime()).toBeGreaterThan(dateRange().from?.getTime() ?? 0);
+
+    expect(usedDateRange()).toEqual(dateRange);
   });
 
   it('should hand events over to eventList', async () => {
-    const { fixture } = await setup();
+    const { fixture } = await setup('events');
 
     const eventlist = fixture.debugElement.query(By.directive(EventListComponent))
       .componentInstance as EventListComponent | undefined;
@@ -147,31 +161,8 @@ describe('TrackerDetail', () => {
     expect(eventlist?.events()).toHaveLength(events.length);
   });
 
-  it('should only render counter stats when counter tracker', async () => {
-    const { fixture } = await setup(makeCounterTracker({ summary: { sum: 10 } }));
-
-    const counterTracker = fixture.debugElement.query(By.directive(CounterTrackerStatsComponent));
-    const categoryTracker = fixture.debugElement.query(By.directive(CategoryTrackerStatsComponent));
-
-    expect(counterTracker).toBeDefined();
-    expect(categoryTracker).toBeNull();
-  });
-
-  it('should only render category stats when category tracker', async () => {
-    const { fixture } = await setup(
-      makeCategoryTracker({ summary: [{ category: 'test', amount: 10 }] }),
-    );
-
-    const counterTracker = fixture.debugElement.query(By.directive(CounterTrackerStatsComponent));
-    const categoryTracker = fixture.debugElement.query(By.directive(CategoryTrackerStatsComponent));
-
-    expect(counterTracker).toBeNull();
-    expect(categoryTracker).toBeDefined();
-  });
-
   it('should delete an event after confirmation and reload the data', async () => {
-    const { fixture, deleteEventSpy, eventsResource } = await setup();
-
+    const { fixture, deleteEventSpy, eventsResource } = await setup('events');
     const eventListEl = fixture.debugElement.query(By.directive(EventListComponent))
       .componentInstance as EventListComponent;
     eventListEl.onDelete.emit('e2');
@@ -188,10 +179,9 @@ describe('TrackerDetail', () => {
     deleteButtonEl.componentInstance.clicked.emit();
     fixture.detectChanges();
 
-    const [eventConfirmDialog, trackerConfirmDialog] = fixture.debugElement
+    const [trackerConfirmDialog] = fixture.debugElement
       .queryAll(By.directive(ConfirmDialogComponent))
       .map((el) => el.componentInstance as ConfirmDialogComponent);
-    expect(eventConfirmDialog.open()).toBe(false);
     expect(trackerConfirmDialog.open()).toBe(true);
 
     trackerConfirmDialog.confirmed.emit();
@@ -231,7 +221,7 @@ describe('TrackerDetail', () => {
       .componentInstance as DateRangeSelectorComponent | undefined;
 
     dateRangeComponent?.changed.emit({
-      from: new Date(2026, 8, 8, 10, 12, 13),
+      from: new Date(2026, 8, 8),
       to: new Date(2026, 8, 9, 9, 8, 7),
     });
     const [, dateRange] = getTrackerEventsSpy.mock.calls[0] as [

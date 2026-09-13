@@ -1,11 +1,11 @@
 import { TestBed } from '@angular/core/testing';
 import { CounterTrackerStatsComponent } from './counter-tracker-stats.component';
 import { provideTranslateService, TranslateService } from '@ngx-translate/core';
-import { Tracker } from '../../tracker.types';
-import { makeCounterTracker, makeEvent } from '../../../../../../test/test-utils';
-import { TrackerEvent } from '../../events.types';
+import { Tracker } from '../../../tracker.types';
+import { makeCounterTracker, makeEvent } from '../../../../../../../test/test-utils';
+import { TrackerEvent } from '../../../events.types';
 import { inputBinding, signal } from '@angular/core';
-import { DateRange } from '../../../../components/date-range-selector/date-range-selector.component';
+import { DateRange } from '../../../../../components/date-range-selector/date-range-selector.component';
 
 const DEFAULT_RANGE: DateRange = {
   from: new Date('2024-01-01'),

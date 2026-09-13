@@ -1,11 +1,11 @@
 import { Component, computed, inject, input } from '@angular/core';
-import { CounterTrackerEvent } from '../../events.types';
-import { BarChartComponent } from '../../../../components/charts/bar-chart/bar-chart.component';
-import { CalendarHeatmapComponent } from '../../../../components/charts/calendar-heatmap/calendar-heatmap.component';
-import { BigNumberComponent } from '../../../../components/big-number/big-number.component';
-import { DateRange } from '../../../../components/date-range-selector/date-range-selector.component';
-import { StatsService } from '../../services/stats.service';
-import { Tracker } from '../../tracker.types';
+import { CounterTrackerEvent } from '../../../events.types';
+import { BarChartComponent } from '../../../../../components/charts/bar-chart/bar-chart.component';
+import { CalendarHeatmapComponent } from '../../../../../components/charts/calendar-heatmap/calendar-heatmap.component';
+import { BigNumberComponent } from '../../../../../components/big-number/big-number.component';
+import { DateRange } from '../../../../../components/date-range-selector/date-range-selector.component';
+import { StatsService } from '../../../services/stats.service';
+import { Tracker } from '../../../tracker.types';
 
 @Component({
   imports: [BarChartComponent, CalendarHeatmapComponent, BigNumberComponent],

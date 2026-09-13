@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, linkedSignal, signal } from '@angular/core';
 import { TrackerApi } from '../../services/api/tracker.api';
 import { EventApi } from '../../services/api/event.api';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -10,13 +10,15 @@ import {
 } from '../../../../components/date-range-selector/date-range-selector.component';
 import { ButtonComponent } from '../../../../components/button/button.component';
 import { ConfirmDialogComponent } from '../../../../components/confirm-dialog/confirm-dialog.component';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslatePipe, TranslateDirective } from '@ngx-translate/core';
 import { DialogComponent } from '../../../../components/dialog/dialog.component';
 import { TrackerFormComponent } from '../../dumb/tracker-form/tracker-form.component';
 import { CreateTracker } from '../../tracker.types';
 import { CategoryTrackerEvent, CounterTrackerEvent } from '../../events.types';
-import { CounterTrackerStatsComponent } from '../../dumb/counter-tracker-stats/counter-tracker-stats.component';
-import { CategoryTrackerStatsComponent } from '../../dumb/category-tracker-stats/category-tracker-stats.component';
+import { TrackerStatsComponent } from '../../dumb/stats/tracker-stats.component/tracker-stats.component';
+import { toSignal } from '@angular/core/rxjs-interop';
+
+type Tabs = 'stats' | 'events';
 
 @Component({
   imports: [
@@ -27,8 +29,7 @@ import { CategoryTrackerStatsComponent } from '../../dumb/category-tracker-stats
     TranslatePipe,
     DialogComponent,
     TrackerFormComponent,
-    CounterTrackerStatsComponent,
-    CategoryTrackerStatsComponent,
+    TrackerStatsComponent,
   ],
   selector: 'app-tracker-detail',
   styles: `
@@ -53,9 +54,6 @@ import { CategoryTrackerStatsComponent } from '../../dumb/category-tracker-stats
     }
 
     .content {
-      display: grid;
-      grid-template-columns: 1fr 3fr;
-      gap: 1rem;
     }
 
     .events {
@@ -99,40 +97,33 @@ import { CategoryTrackerStatsComponent } from '../../dumb/category-tracker-stats
     </div>
     <div class="toolbar">
       <app-date-range-selector
-        (changed)="dateRangeChanged.set($event)"
-        [dateRange]="this.dateRange()"
+        (changed)="dateRangeChanged($event)"
+        [dateRange]="this.queryDateRange()"
       >
       </app-date-range-selector>
-    </div>
-    <div class="content">
-      @if (this.trackerEvents.hasValue()) {
-        <article class="events" [aria-busy]="this.trackerEvents.isLoading()">
-          <h3>Events</h3>
 
+      <div>
+        <div role="group">
+          <button (click)="changeTab('stats')">Stats</button>
+          <button (click)="changeTab('events')" class="secondary">Events</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="content" [aria-busy]="this.trackerEvents.isLoading()">
+      @if (this.trackerEvents.hasValue() && this.tracker.hasValue()) {
+        @if (this.currentTab() === 'stats') {
+          <app-tracker-stats
+            [tracker]="this.tracker.value()"
+            [trackerEvents]="this.trackerEvents.value()"
+            [dateRange]="this.queryDateRange()"
+          ></app-tracker-stats>
+        }
+        @if (this.currentTab() === 'events') {
           <app-event-list
             [events]="trackerEvents.value()"
             (onDelete)="this.deleteEvent($event)"
           ></app-event-list>
-        </article>
-      }
-
-      @if (this.trackerEvents.hasValue() && this.tracker.hasValue()) {
-        @let tracker = this.tracker.value();
-        @switch (tracker.type) {
-          @case ('counter') {
-            <app-counter-tracker-stats
-              [trackerEvents]="this.counterTrackerEvents()"
-              [tracker]="tracker"
-              [dateRange]="this.dateRangeChanged()"
-            ></app-counter-tracker-stats>
-          }
-          @case ('category') {
-            <app-category-tracker-stats
-              [trackerEvents]="this.categoryTrackerEvents()"
-              [trackerSummary]="tracker.summary"
-              [dateRange]="this.dateRangeChanged()"
-            ></app-category-tracker-stats>
-          }
         }
       }
     </div>
@@ -158,41 +149,43 @@ import { CategoryTrackerStatsComponent } from '../../dumb/category-tracker-stats
   `,
 })
 export class TrackerDetailComponent {
-  private router = inject(Router);
-  private activatedRoute = inject(ActivatedRoute);
-  readonly trackerId = signal(this.activatedRoute.snapshot.params['id']);
+  private readonly router = inject(Router);
+  private readonly activatedRoute = inject(ActivatedRoute);
+  public readonly trackerId = signal(this.activatedRoute.snapshot.params['id']);
+  private readonly routeQueryParams = toSignal(this.activatedRoute.queryParamMap, {
+    requireSync: true,
+  });
+
+  public readonly currentTab = computed<Tabs>(() => {
+    const tab = this.routeQueryParams().get('tab');
+    return (tab ?? 'stats') as Tabs;
+  });
+
   readonly deleteDialogOpen = signal(false);
   readonly editDialogOpen = signal(false);
 
-  public dateRange = signal<DateRange>({
-    from: daysAgo(7),
-    to: new Date(),
-  });
-
-  public dateRangeChanged = signal<DateRange>({
-    ...this.dateRange(),
-  });
-
-  private dateRangeTransformed = computed(() => {
-    const date = this.dateRangeChanged();
-    const to = date.to;
-    const from = date.from;
-    if (to) {
-      to.setHours(23, 59, 59);
-    }
-    if (from) {
-      from.setHours(0, 0, 0);
-    }
+  public queryDateRange = computed<DateRange>(() => {
+    const from = this.routeQueryParams().get('from');
+    const to = this.routeQueryParams().get('to');
+    const fromParsed = from ? new Date(from) : daysAgo(7);
+    const toParsed = to ? new Date(to) : new Date();
     return {
-      from: from,
-      to: to,
+      from: fromParsed,
+      to: toParsed,
     };
+  });
+
+  public dateRange = linkedSignal({
+    source: this.queryDateRange,
+    computation: (dateRange) => {
+      return dateRange;
+    },
   });
 
   private trackerApi = inject(TrackerApi);
   private eventApi = inject(EventApi);
   public tracker = this.trackerApi.getTracker(this.trackerId);
-  public trackerEvents = this.eventApi.getTrackerEvents(this.trackerId, this.dateRangeTransformed);
+  public trackerEvents = this.eventApi.getTrackerEvents(this.trackerId, this.dateRange);
 
   public counterTrackerEvents = computed(() => {
     return this.trackerEvents.value() as CounterTrackerEvent[];
@@ -228,6 +221,29 @@ export class TrackerDetailComponent {
     this.trackerApi.editTracker(this.trackerId(), updatedTrackerName).subscribe((tracker) => {
       this.tracker.set(tracker);
       this.editDialogOpen.set(false);
+    });
+  }
+
+  changeTab(tab: Tabs) {
+    this.router.navigate([], {
+      queryParams: { tab },
+    });
+  }
+  dateRangeChanged(dateRange: DateRange) {
+    const to = dateRange.to;
+    const from = dateRange.from;
+    this.router.navigate([], {
+      queryParams: { from: from.toISOString(), to: to.toISOString() },
+    });
+    if (to) {
+      to.setHours(23, 59, 59);
+    }
+    if (from) {
+      from.setHours(0, 0, 0);
+    }
+    this.dateRange.set({
+      from,
+      to,
     });
   }
 }

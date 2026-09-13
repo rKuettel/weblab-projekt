@@ -1,11 +1,11 @@
 import { Component, computed, inject, input } from '@angular/core';
-import { CategoryTrackerEvent } from '../../events.types';
-import { BarChartComponent } from '../../../../components/charts/bar-chart/bar-chart.component';
-import { DateRange } from '../../../../components/date-range-selector/date-range-selector.component';
-import { PieChartComponent } from '../../../../components/charts/pie-chart/pie-chart.component';
-import { StatsService } from '../../services/stats.service';
-import { CategoryTrackerSummary } from '../../tracker.types';
-import { ChartsData } from '../../../../components/charts/chart-data.type';
+import { CategoryTrackerEvent } from '../../../events.types';
+import { BarChartComponent } from '../../../../../components/charts/bar-chart/bar-chart.component';
+import { DateRange } from '../../../../../components/date-range-selector/date-range-selector.component';
+import { PieChartComponent } from '../../../../../components/charts/pie-chart/pie-chart.component';
+import { StatsService } from '../../../services/stats.service';
+import { CategoryTrackerSummary } from '../../../tracker.types';
+import { ChartsData } from '../../../../../components/charts/chart-data.type';
 
 @Component({
   imports: [BarChartComponent, PieChartComponent],
