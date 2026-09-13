@@ -18,6 +18,8 @@ import {
   DateRangeSelectorComponent,
 } from '../../../../components/date-range-selector/date-range-selector.component';
 import { Tracker } from '../../tracker.types';
+import { DialogComponent } from '../../../../components/dialog/dialog.component';
+import { EventFormComponent } from '../../dumb/event-form/event-form.component';
 
 const events: TrackerEvent[] = [
   makeEvent({ id: 'e1', timestamp: new Date('2024-06-10T10:00:00Z'), data: { delta: 10 } }),
@@ -44,6 +46,7 @@ describe('TrackerDetail', () => {
   ) {
     const getTrackerSpy = vi.fn();
     const getTrackerEventsSpy = vi.fn();
+    const addEventSpy = vi.fn().mockReturnValue(of({}));
     const deleteEventSpy = vi.fn().mockReturnValue(of({}));
     const deleteTrackerSpy = vi.fn().mockReturnValue(of({}));
     const editTrackerSpy = vi.fn();
@@ -94,6 +97,7 @@ describe('TrackerDetail', () => {
           useValue: {
             getTrackerEvents: getTrackerEventsSpy.mockImplementation(() => eventsResource),
             deleteEvent: deleteEventSpy,
+            addEvent: addEventSpy,
           },
         },
       ],
@@ -123,6 +127,7 @@ describe('TrackerDetail', () => {
       root: fixture.nativeElement as Element,
       getTrackerSpy,
       getTrackerEventsSpy,
+      addEventSpy,
       deleteEventSpy,
       deleteTrackerSpy,
       editTrackerSpy,
@@ -175,7 +180,9 @@ describe('TrackerDetail', () => {
   it('should delete the tracker and navigate home after confirmation', async () => {
     const { fixture, deleteTrackerSpy, navigateSpy } = await setup();
 
-    const [_, deleteButtonEl] = fixture.debugElement.queryAll(By.directive(ButtonComponent));
+    const [_edit, _addEvent, deleteButtonEl] = fixture.debugElement.queryAll(
+      By.directive(ButtonComponent),
+    );
     deleteButtonEl.componentInstance.clicked.emit();
     fixture.detectChanges();
 
@@ -196,6 +203,16 @@ describe('TrackerDetail', () => {
   it('should call api and close the dialog when updating the tracker', async () => {
     const { fixture, component, editTrackerSpy, trackerSet } = await setup();
 
+    const [edit] = fixture.debugElement.queryAll(By.directive(ButtonComponent));
+    edit.componentInstance.clicked.emit();
+    fixture.detectChanges();
+
+    const trackerEditDialog = fixture.debugElement
+      .queryAll(By.directive(DialogComponent))
+      .find((e) => e.attributes['id'] === 'trackerEditDialog')
+      ?.componentInstance as DialogComponent;
+    expect(trackerEditDialog.open()).toBe(true);
+
     const form = fixture.debugElement.query(By.directive(TrackerFormComponent))
       .componentInstance as TrackerFormComponent;
     expect(form.tracker()).toEqual(
@@ -204,16 +221,39 @@ describe('TrackerDetail', () => {
     expect(form.typeDisabled()).toBe(true);
 
     const updated = makeCounterTracker({ id: '42', name: 'Renamed' });
-    form.onFormSubmit.emit(updated);
     editTrackerSpy.mockReturnValue(of(updated));
-
-    component.updateTracker({ name: 'Renamed', type: 'counter' });
+    form.onFormSubmit.emit(updated);
+    TestBed.tick();
+    fixture.detectChanges();
 
     expect(editTrackerSpy).toHaveBeenCalledWith('42', { name: 'Renamed' });
     expect(trackerSet).toHaveBeenCalledWith(updated);
     expect(component.editDialogOpen()).toBe(false);
   });
 
+  it('should call api and close the dialog when adding a event', async () => {
+    const { fixture, component, addEventSpy, trackerSet } = await setup();
+
+    const [_edit, addEvent] = fixture.debugElement.queryAll(By.directive(ButtonComponent));
+    addEvent.componentInstance.clicked.emit();
+    fixture.detectChanges();
+
+    const trackerEditDialog = fixture.debugElement
+      .queryAll(By.directive(DialogComponent))
+      .find((e) => e.attributes['id'] === 'eventAddDialog')?.componentInstance as DialogComponent;
+    expect(trackerEditDialog.open()).toBe(true);
+
+    const form = fixture.debugElement.query(By.directive(EventFormComponent))
+      .componentInstance as EventFormComponent;
+
+    addEventSpy.mockReturnValue(of(makeCounterTracker({ summary: { sum: 100 } })));
+    const updated = makeEvent({ timestamp: new Date() });
+    form.onFormSubmit.emit(updated);
+
+    expect(addEventSpy).toHaveBeenCalledWith('42', updated);
+    expect(trackerSet).toHaveBeenCalled();
+    expect(component.editDialogOpen()).toBe(false);
+  });
   it('should update the date range passed to the event API when the range changes', async () => {
     const { fixture, getTrackerEventsSpy } = await setup();
 

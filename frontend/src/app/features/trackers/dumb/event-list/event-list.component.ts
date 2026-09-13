@@ -8,8 +8,16 @@ import { TranslatePipe } from '@ngx-translate/core';
   imports: [ButtonComponent, ConfirmDialogComponent, TranslatePipe],
   selector: 'app-event-list',
   styles: `
-    section {
-      border:;
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .event-data {
+      margin-bottom: 0;
+    }
+    .data-label {
+      font-weight: 600;
     }
   `,
   template: `
@@ -17,17 +25,27 @@ import { TranslatePipe } from '@ngx-translate/core';
       event of [...this.events()].sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
       track event.id
     ) {
-      <div class="event" [attr.data-testid]="'event' + event.id">
-        <p>Timestamp: {{ event.timestamp }}</p>
-        <p>Data: {{ this.toJson(event.data) }}</p>
-        <app-button
-          (clicked)="eventIdToDelete.set(event.id)"
-          variant="secondary"
-          [text]="'event.delete' | translate"
-        ></app-button>
-      </div>
+      <article class="event" [attr.data-testid]="'event' + event.id">
+        <header>
+          @let timestamp = event.timestamp;
+          <strong>{{ formatDate(timestamp) }}</strong>
+          <app-button
+            (clicked)="eventIdToDelete.set(event.id)"
+            [outlined]="true"
+            variant="secondary"
+            [text]="'event.delete' | translate"
+          ></app-button>
+        </header>
 
-      <hr />
+        <ul class="event-data">
+          @for (entry of entries(event.data); track $index) {
+            <li class="data-item">
+              <span class="data-label">{{ entry[0] }}: </span>
+              <span class="data-value">{{ entry[1] }}</span>
+            </li>
+          }
+        </ul>
+      </article>
     }
 
     <app-confirm-dialog
@@ -40,6 +58,11 @@ import { TranslatePipe } from '@ngx-translate/core';
   `,
 })
 export class EventListComponent {
+  private dateTimeFormat = new Intl.DateTimeFormat(undefined, {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  });
+
   readonly events = input.required<TrackerEvent[]>();
   readonly onDelete = output<string>();
 
@@ -54,7 +77,11 @@ export class EventListComponent {
     }
   }
 
-  toJson(test: any): string {
-    return JSON.stringify(test);
+  formatDate(date: Date): string {
+    return this.dateTimeFormat.format(date);
+  }
+
+  entries(data: any): [string, unknown][] {
+    return Object.entries(data);
   }
 }

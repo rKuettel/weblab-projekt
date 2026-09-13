@@ -10,14 +10,15 @@ import {
 } from '../../../../components/date-range-selector/date-range-selector.component';
 import { ButtonComponent } from '../../../../components/button/button.component';
 import { ConfirmDialogComponent } from '../../../../components/confirm-dialog/confirm-dialog.component';
-import { TranslatePipe, TranslateDirective } from '@ngx-translate/core';
+import { translate, TranslatePipe } from '@ngx-translate/core';
 import { DialogComponent } from '../../../../components/dialog/dialog.component';
 import { TrackerFormComponent } from '../../dumb/tracker-form/tracker-form.component';
 import { CreateTracker } from '../../tracker.types';
-import { CategoryTrackerEvent, CounterTrackerEvent } from '../../events.types';
+import { CategoryTrackerEvent, CounterTrackerEvent, CreateTrackerEvent } from '../../events.types';
 import { TrackerStatsComponent } from '../../dumb/stats/tracker-stats.component/tracker-stats.component';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { TabEntry, TabListComponent } from '../../../../components/tab-list/tab-list.component';
+import { EventFormComponent } from '../../dumb/event-form/event-form.component';
 
 type Tabs = 'stats' | 'events';
 
@@ -32,6 +33,7 @@ type Tabs = 'stats' | 'events';
     TrackerFormComponent,
     TrackerStatsComponent,
     TabListComponent,
+    EventFormComponent,
   ],
   selector: 'app-tracker-detail',
   styles: `
@@ -55,9 +57,6 @@ type Tabs = 'stats' | 'events';
     .header h2 {
       margin-bottom: 0;
     }
-
-    .content {
-    }
   `,
   template: `
     <div class="header">
@@ -68,6 +67,12 @@ type Tabs = 'stats' | 'events';
           (clicked)="editDialogOpen.set(true)"
         ></app-button>
         <app-button
+          variant="secondary"
+          [text]="'event.add' | translate"
+          (clicked)="addEventDialogOpen.set(true)"
+        ></app-button>
+        <app-button
+          [outlined]="true"
           variant="secondary"
           [text]="'tracker.delete' | translate"
           (clicked)="deleteDialogOpen.set(true)"
@@ -117,6 +122,8 @@ type Tabs = 'stats' | 'events';
     ></app-confirm-dialog>
 
     <app-dialog
+      id="trackerEditDialog"
+      [title]="addEventDialogTitle()"
       [title]="'tracker.edit' | translate"
       [open]="editDialogOpen()"
       (onClose)="editDialogOpen.set(false)"
@@ -127,12 +134,25 @@ type Tabs = 'stats' | 'events';
         (onFormSubmit)="updateTracker($event)"
       ></app-tracker-form>
     </app-dialog>
+
+    <app-dialog
+      id="eventAddDialog"
+      [title]="addEventDialogTitle()"
+      [open]="addEventDialogOpen()"
+      (onClose)="addEventDialogOpen.set(false)"
+    >
+      <app-event-form
+        [trackerType]="tracker.value()?.type ?? 'counter'"
+        (onFormSubmit)="addEvent($event)"
+      ></app-event-form>
+    </app-dialog>
   `,
 })
 export class TrackerDetailComponent {
   private readonly router = inject(Router);
   private readonly activatedRoute = inject(ActivatedRoute);
-  public readonly trackerId = signal(this.activatedRoute.snapshot.params['id']);
+  private readonly trackerApi = inject(TrackerApi);
+  private readonly eventApi = inject(EventApi);
   private readonly routeQueryParams = toSignal(this.activatedRoute.queryParamMap, {
     requireSync: true,
   });
@@ -147,14 +167,22 @@ export class TrackerDetailComponent {
       value: 'events',
     },
   ];
-
   public readonly currentTab = computed<Tabs>(() => {
     const tab = this.routeQueryParams().get('tab');
     return (tab ?? 'stats') as Tabs;
   });
 
+  public readonly trackerId = signal(this.activatedRoute.snapshot.params['id']);
+
   readonly deleteDialogOpen = signal(false);
   readonly editDialogOpen = signal(false);
+
+  readonly addEventDialogOpen = signal(false);
+  public addEventTranslated = translate('event.add');
+  public addEventDialogTitle = computed<string>(() => {
+    const currentTracker = this.tracker.value()?.name ?? '';
+    return `${this.addEventTranslated()}: ${currentTracker}`;
+  });
 
   public queryDateRange = computed<DateRange>(() => {
     const from = this.routeQueryParams().get('from');
@@ -166,7 +194,6 @@ export class TrackerDetailComponent {
       to: toParsed,
     };
   });
-
   public dateRange = linkedSignal({
     source: this.queryDateRange,
     computation: (dateRange) => {
@@ -174,17 +201,8 @@ export class TrackerDetailComponent {
     },
   });
 
-  private trackerApi = inject(TrackerApi);
-  private eventApi = inject(EventApi);
   public tracker = this.trackerApi.getTracker(this.trackerId);
   public trackerEvents = this.eventApi.getTrackerEvents(this.trackerId, this.dateRange);
-
-  public counterTrackerEvents = computed(() => {
-    return this.trackerEvents.value() as CounterTrackerEvent[];
-  });
-  public categoryTrackerEvents = computed(() => {
-    return this.trackerEvents.value() as CategoryTrackerEvent[];
-  });
 
   constructor() {
     this.activatedRoute.params.subscribe((params) => {
@@ -213,6 +231,14 @@ export class TrackerDetailComponent {
     this.trackerApi.editTracker(this.trackerId(), updatedTrackerName).subscribe((tracker) => {
       this.tracker.set(tracker);
       this.editDialogOpen.set(false);
+    });
+  }
+
+  addEvent(event: CreateTrackerEvent) {
+    this.eventApi.addEvent(this.trackerId(), event).subscribe((updated) => {
+      this.tracker.set(updated);
+      this.trackerEvents.reload();
+      this.addEventDialogOpen.set(false);
     });
   }
 
