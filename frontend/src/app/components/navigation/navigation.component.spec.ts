@@ -14,7 +14,7 @@ describe('Navigation', () => {
   it('should render title', async () => {
     const { fixture } = await setup();
     const title = fixture.nativeElement.querySelector('[data-testid="title"]');
-    expect(title.textContent).toBe('Title');
+    expect(title.textContent.trim()).toBe('Title');
   });
 });
 

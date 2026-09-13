@@ -4,6 +4,12 @@ import { Field, FormField } from '@angular/forms/signals';
 @Component({
   selector: 'app-input',
   imports: [FormField],
+  styles: `
+    :host {
+      margin: 0;
+      padding: 0 !important;
+    }
+  `,
   template: `
     @if (!this.formField()().hidden()) {
       <label>
@@ -18,12 +24,6 @@ import { Field, FormField } from '@angular/forms/signals';
           <small [attr.data-testid]="'error-' + this.label()">{{ error.message }}</small>
         }
       </label>
-    }
-  `,
-  styles: `
-    .error {
-      color: #b3261e;
-      font-size: 0.8rem;
     }
   `,
 })

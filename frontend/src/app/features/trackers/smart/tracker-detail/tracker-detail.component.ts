@@ -17,6 +17,7 @@ import { CreateTracker } from '../../tracker.types';
 import { CategoryTrackerEvent, CounterTrackerEvent } from '../../events.types';
 import { TrackerStatsComponent } from '../../dumb/stats/tracker-stats.component/tracker-stats.component';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { TabEntry, TabListComponent } from '../../../../components/tab-list/tab-list.component';
 
 type Tabs = 'stats' | 'events';
 
@@ -30,6 +31,7 @@ type Tabs = 'stats' | 'events';
     DialogComponent,
     TrackerFormComponent,
     TrackerStatsComponent,
+    TabListComponent,
   ],
   selector: 'app-tracker-detail',
   styles: `
@@ -42,7 +44,8 @@ type Tabs = 'stats' | 'events';
     .toolbar {
       display: flex;
       width: 100%;
-      align-items: center;
+      justify-content: space-between;
+      align-items: start;
     }
     .actions {
       display: flex;
@@ -55,34 +58,10 @@ type Tabs = 'stats' | 'events';
 
     .content {
     }
-
-    .events {
-      min-width: 20rem;
-    }
-
-    .stats {
-      display: grid;
-      gap: 1rem;
-      grid-template-columns: 1fr 1fr;
-      align-items: start;
-      align-content: start;
-    }
-
-    /* @media screen and (min-width: 768px) { */
-    /*   .content { */
-    /*     grid-template-columns: repeat(2, 1fr); */
-    /*   } */
-    /* } */
-    /* @media only screen and (min-width: 1024px) { */
-    /*   .content { */
-    /*     grid-template-columns: repeat(3, 1fr); */
-    /*   } */
-    /* } */
   `,
   template: `
     <div class="header">
       <h2>Tracker: {{ this.tracker.value()?.name || '' }}</h2>
-
       <div class="actions">
         <app-button
           [text]="'tracker.edit' | translate"
@@ -96,18 +75,20 @@ type Tabs = 'stats' | 'events';
       </div>
     </div>
     <div class="toolbar">
+      <div>
+        <div role="group">
+          <app-tab-list
+            [tabs]="tabs"
+            [selectedTab]="currentTab()"
+            (tabChanged)="changeTab($event)"
+          ></app-tab-list>
+        </div>
+      </div>
       <app-date-range-selector
         (changed)="dateRangeChanged($event)"
         [dateRange]="this.queryDateRange()"
       >
       </app-date-range-selector>
-
-      <div>
-        <div role="group">
-          <button (click)="changeTab('stats')">Stats</button>
-          <button (click)="changeTab('events')" class="secondary">Events</button>
-        </div>
-      </div>
     </div>
 
     <div class="content" [aria-busy]="this.trackerEvents.isLoading()">
@@ -136,7 +117,7 @@ type Tabs = 'stats' | 'events';
     ></app-confirm-dialog>
 
     <app-dialog
-      [title]="'tracker.Edit' | translate"
+      [title]="'tracker.edit' | translate"
       [open]="editDialogOpen()"
       (onClose)="editDialogOpen.set(false)"
     >
@@ -155,6 +136,17 @@ export class TrackerDetailComponent {
   private readonly routeQueryParams = toSignal(this.activatedRoute.queryParamMap, {
     requireSync: true,
   });
+
+  public readonly tabs: TabEntry[] = [
+    {
+      translationId: 'tracker.tab.stats',
+      value: 'stats',
+    },
+    {
+      translationId: 'tracker.tab.events',
+      value: 'events',
+    },
+  ];
 
   public readonly currentTab = computed<Tabs>(() => {
     const tab = this.routeQueryParams().get('tab');
@@ -224,7 +216,7 @@ export class TrackerDetailComponent {
     });
   }
 
-  changeTab(tab: Tabs) {
+  changeTab(tab: string) {
     this.router.navigate([], {
       queryParams: { tab },
     });

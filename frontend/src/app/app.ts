@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
+import { RouterLink, RouterOutlet } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { NavigationComponent } from './components/navigation/navigation.component';
 import { PATHS } from './config/paths.config';
 

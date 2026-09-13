@@ -7,19 +7,27 @@ import { ThemeSwitcherComponent } from '../theme-switcher/theme-switcher.compone
 @Component({
   selector: 'app-navigation',
   imports: [RouterLink, RouterLinkActive, TranslatePipe, ThemeSwitcherComponent],
+  styles: `
+    .title {
+      cursor: pointer;
+      margin-bottom: 0;
+    }
+  `,
   template: `
     <nav>
       <ul>
         <li>
-          <strong data-testid="title">{{ title | translate }}</strong>
+          <h1 class="title" [routerLink]="['/']" data-testid="title" clicka>
+            {{ title | translate }}
+          </h1>
         </li>
       </ul>
       <ul>
         @for (linkItem of links(); track linkItem.path) {
           <li>
-            <button [routerLink]="linkItem.path" routerLinkActive="active">
+            <a [routerLink]="linkItem.path" routerLinkActive="active">
               {{ linkItem.translationId | translate }}
-            </button>
+            </a>
           </li>
         }
         <li><app-theme-switcher /></li>
@@ -27,7 +35,6 @@ import { ThemeSwitcherComponent } from '../theme-switcher/theme-switcher.compone
     </nav>
   `,
   changeDetection: ChangeDetectionStrategy.Eager,
-  styles: ``,
 })
 export class NavigationComponent {
   title = 'app.title';
