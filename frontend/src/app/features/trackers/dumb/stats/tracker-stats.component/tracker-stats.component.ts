@@ -15,7 +15,6 @@ import { CategoryTrackerStatsComponent } from '../category-tracker-stats/categor
       @case ('counter') {
         <app-counter-tracker-stats
           [trackerEvents]="this.counterTrackerEvents()"
-          [tracker]="currentTracker"
           [dateRange]="this.dateRange()"
         ></app-counter-tracker-stats>
       }

@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 import { TrackerStatsComponent } from './tracker-stats.component';
 import { Tracker } from '../../../tracker.types';
 import { TrackerEvent } from '../../../events.types';
@@ -11,6 +11,7 @@ import { By } from '@angular/platform-browser';
 import { CounterTrackerStatsComponent } from '../counter-tracker-stats/counter-tracker-stats.component';
 import { CategoryTrackerStatsComponent } from '../category-tracker-stats/category-tracker-stats.component';
 import { inputBinding, signal } from '@angular/core';
+import { provideTranslateService } from '@ngx-translate/core';
 
 const events: TrackerEvent[] = [
   makeEvent({ id: 'e1', timestamp: new Date('2024-06-10T10:00:00Z'), data: { delta: 10 } }),
@@ -24,7 +25,7 @@ describe('TrackerStatsComponent', () => {
   ) {
     await TestBed.configureTestingModule({
       imports: [TrackerStatsComponent],
-      providers: [],
+      providers: [provideTranslateService({ fallbackLang: 'en' })],
     }).compileComponents();
 
     const fixture = TestBed.createComponent(TrackerStatsComponent, {

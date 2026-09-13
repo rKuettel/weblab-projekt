@@ -79,7 +79,8 @@ export class DateRangeSelectorComponent {
   }
 }
 function toDateString(date?: Date): string {
-  return date ? date.toISOString().split('T')[0] : '';
+  const result = date ? date.toISOString().split('T')[0] : '';
+  return result;
 }
 
 export interface DateRange {

@@ -21,4 +21,6 @@
 | 11. Sept  | 5.5h    | Hinzufügen von Ketegorie Trackern im Frontend Trackers                                        |
 | 12. Sept  | 2h      | Anpassung Unittests nach Kategorien erweiterung                                               |
 | 13. Sept  | 1.5h    | Auslagerung von Events und Statisiken in seperate tabs auf der Detail Page                    |
-| **Total** | 56h     |                                                                                               |
+| 13. Sept  | 1h      | Event List Komponenten überarbeitet                                                           |
+| 13. Sept  | 3h      | Überarbeitung/vereinheitlichung der statistik ansichten                                       |
+| **Total** | 60h     |                                                                                               |

@@ -42,8 +42,9 @@ describe('BigNumber', () => {
 
   it('scales the font size down for long numbers', async () => {
     for (const [summary, expected] of [
-      [1234, 100 / 4 / 0.6],
-      [12345, 100 / 5 / 0.6],
+      [123, 50], // Min width
+      [1234, 100 / 5 / 0.6], // Sign for 1k
+      [12345, 100 / 6 / 0.6], // Sing for 1k
     ] as const) {
       const { component } = await setup(summary);
       expect(parseFloat(component.fontSize())).toBeCloseTo(expected);

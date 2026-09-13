@@ -11,7 +11,7 @@ import {
 import { SVGRenderer } from 'echarts/renderers';
 import { ThemeService } from '../../../services/theme.service';
 import { ChartsData } from '../chart-data.type';
-import { EChartsOption, SeriesOption } from 'echarts';
+import { EChartsOption } from 'echarts';
 echarts.use([
   PieChart,
   DatasetComponent,

@@ -25,15 +25,16 @@ import { Component, computed, input } from '@angular/core';
   `,
   template: `
     <span class="big-number" [style.font-size]="fontSize()">
-      {{ number() }}
+      {{ numberString() }}
     </span>
   `,
 })
 export class BigNumberComponent {
   readonly number = input.required<number>();
+  readonly numberString = computed(() => this.number().toLocaleString());
 
   fontSize = computed(() => {
-    const digits = this.number().toString().length;
+    const digits = this.numberString().length;
     // Divide by 0.6 since this is the recommended ratio between height and width of a monospaced font
     const size = Math.min(100 / digits / 0.6, 50);
     return `${size}cqw`;

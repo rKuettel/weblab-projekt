@@ -11,6 +11,7 @@ export type ButtonType = 'button' | 'submit' | 'reset';
       width: fit-content;
     }
     button {
+      white-space: nowrap;
       margin: 0;
     }
     .full-width {

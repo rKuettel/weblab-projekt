@@ -27,6 +27,19 @@
     "tab": {
       "stats": "Stats",
       "events": "Events"
+    },
+    "stats": {
+      "counter": {
+        "total": "Total",
+        "dailyAvg": "Daily Average",
+        "heatmap": "Calendar Heatmap",
+        "barChart": "Bar Chart"
+      },
+      "category": {
+        "pie": "Pie Chart",
+        "total": "Total of all Categories",
+        "barChart": "Bar Chart"
+      }
     }
   },
   "event": {

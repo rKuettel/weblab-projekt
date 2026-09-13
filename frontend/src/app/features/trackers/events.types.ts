@@ -1,9 +1,15 @@
-export interface TrackerEvent {
+export interface BaseTrackerEvent<D extends TrackerEventData> {
   id: string;
   timestamp: Date;
-  data: TrackerEventData;
+  data: D;
 }
 
+// export type TrackerEvent = BaseTrackerEvent<TrackerEventData>;
+export interface TrackerEvent<D extends TrackerEventData = TrackerEventData> {
+  id: string;
+  timestamp: Date;
+  data: D;
+}
 export type CreateTrackerEvent = Omit<TrackerEvent, 'id'>;
 
 export type TrackerEventData = CounterEventData | CategoryEventData;
@@ -17,7 +23,7 @@ export interface CategoryEventData {
   amount: number;
 }
 
-type EventOf<T, Data extends TrackerEventData> = Omit<T, 'data'> & { data: Data };
-
-export type CounterTrackerEvent = EventOf<TrackerEvent, CounterEventData>;
-export type CategoryTrackerEvent = EventOf<TrackerEvent, CategoryEventData>;
+// export type CounterTrackerEvent = BaseTrackerEvent<CounterEventData>;
+export type CounterTrackerEvent = TrackerEvent<CounterEventData>;
+// export type CategoryTrackerEvent = BaseTrackerEvent<CategoryEventData>;
+export type CategoryTrackerEvent = TrackerEvent<CategoryEventData>;

@@ -14,7 +14,7 @@ import { translate, TranslatePipe } from '@ngx-translate/core';
 import { DialogComponent } from '../../../../components/dialog/dialog.component';
 import { TrackerFormComponent } from '../../dumb/tracker-form/tracker-form.component';
 import { CreateTracker } from '../../tracker.types';
-import { CategoryTrackerEvent, CounterTrackerEvent, CreateTrackerEvent } from '../../events.types';
+import { CreateTrackerEvent } from '../../events.types';
 import { TrackerStatsComponent } from '../../dumb/stats/tracker-stats.component/tracker-stats.component';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { TabEntry, TabListComponent } from '../../../../components/tab-list/tab-list.component';
@@ -41,17 +41,21 @@ type Tabs = 'stats' | 'events';
       display: flex;
       gap: 1rem;
       justify-content: space-between;
-      align-items: center;
+      white-space: nowrap;
+    }
+
+    .actions {
+      display: flex;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+      gap: 0.5rem;
     }
     .toolbar {
       display: flex;
       width: 100%;
       justify-content: space-between;
       align-items: start;
-    }
-    .actions {
-      display: flex;
-      gap: 0.5rem;
+      flex-wrap: wrap;
     }
 
     .header h2 {
@@ -187,7 +191,7 @@ export class TrackerDetailComponent {
   public queryDateRange = computed<DateRange>(() => {
     const from = this.routeQueryParams().get('from');
     const to = this.routeQueryParams().get('to');
-    const fromParsed = from ? new Date(from) : daysAgo(7);
+    const fromParsed = from ? new Date(from) : daysAgo(6);
     const toParsed = to ? new Date(to) : new Date();
     return {
       from: fromParsed,
@@ -197,7 +201,14 @@ export class TrackerDetailComponent {
   public dateRange = linkedSignal({
     source: this.queryDateRange,
     computation: (dateRange) => {
-      return dateRange;
+      const to = new Date(dateRange.to);
+      const from = new Date(dateRange.from);
+      to.setHours(23, 59, 59);
+      from.setHours(0, 0, 0);
+      return {
+        to,
+        from,
+      };
     },
   });
 
@@ -243,25 +254,17 @@ export class TrackerDetailComponent {
   }
 
   changeTab(tab: string) {
+    const to = this.dateRange().to;
+    const from = this.dateRange().from;
     this.router.navigate([], {
-      queryParams: { tab },
+      queryParams: { tab, from: from.toISOString(), to: to.toISOString() },
     });
   }
   dateRangeChanged(dateRange: DateRange) {
     const to = dateRange.to;
     const from = dateRange.from;
     this.router.navigate([], {
-      queryParams: { from: from.toISOString(), to: to.toISOString() },
-    });
-    if (to) {
-      to.setHours(23, 59, 59);
-    }
-    if (from) {
-      from.setHours(0, 0, 0);
-    }
-    this.dateRange.set({
-      from,
-      to,
+      queryParams: { tab: this.currentTab(), from: from.toISOString(), to: to.toISOString() },
     });
   }
 }

@@ -137,11 +137,12 @@ describe('TrackerDetail', () => {
     };
   }
 
-  it('should request the tracker and its events by the route id', async () => {
+  it('should request the tracker and its events by the route id and date range (normailized to midnight)', async () => {
     const dateRange = {
       from: new Date(2026, 8, 8, 10, 12, 13),
-      to: new Date(2026, 8, 9, 9, 8, 7),
+      to: new Date(2026, 8, 9, 9, 8, 8),
     };
+
     const { getTrackerSpy, getTrackerEventsSpy } = await setup('stats', dateRange);
 
     expect(getTrackerSpy).toHaveBeenCalledOnce();
@@ -154,7 +155,11 @@ describe('TrackerDetail', () => {
     ];
     expect(trackerId()).toBe('42');
 
-    expect(usedDateRange()).toEqual(dateRange);
+    const expectedDateRange = {
+      from: new Date(2026, 8, 8),
+      to: new Date(2026, 8, 9, 23, 59, 59),
+    };
+    expect(usedDateRange()).toEqual(expectedDateRange);
   });
 
   it('should hand events over to eventList', async () => {
@@ -254,8 +259,9 @@ describe('TrackerDetail', () => {
     expect(trackerSet).toHaveBeenCalled();
     expect(component.editDialogOpen()).toBe(false);
   });
-  it('should update the date range passed to the event API when the range changes', async () => {
-    const { fixture, getTrackerEventsSpy } = await setup();
+
+  it('should update query params when the date range changed', async () => {
+    const { fixture, navigateSpy } = await setup();
 
     const dateRangeComponent = fixture.debugElement.query(By.directive(DateRangeSelectorComponent))
       .componentInstance as DateRangeSelectorComponent | undefined;
@@ -264,12 +270,13 @@ describe('TrackerDetail', () => {
       from: new Date(2026, 8, 8),
       to: new Date(2026, 8, 9, 9, 8, 7),
     });
-    const [, dateRange] = getTrackerEventsSpy.mock.calls[0] as [
-      Signal<string>,
-      Signal<EventsQueryParams>,
-    ];
 
-    expect(dateRange().from).toStrictEqual(new Date(2026, 8, 8));
-    expect(dateRange().to).toStrictEqual(new Date(2026, 8, 9, 23, 59, 59));
+    expect(navigateSpy).toHaveBeenCalledWith([], {
+      queryParams: {
+        tab: 'stats',
+        from: new Date(2026, 8, 8).toISOString(),
+        to: new Date(2026, 8, 9, 9, 8, 7).toISOString(),
+      },
+    });
   });
 });

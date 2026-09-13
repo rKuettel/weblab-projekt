@@ -1,5 +1,5 @@
 import type { EChartsCoreOption } from 'echarts/core';
-import { NgxEchartsDirective, provideEchartsCore, ThemeOption } from 'ngx-echarts';
+import { NgxEchartsDirective, provideEchartsCore } from 'ngx-echarts';
 import * as echarts from 'echarts/core';
 import { BarChart, HeatmapChart } from 'echarts/charts';
 import {
