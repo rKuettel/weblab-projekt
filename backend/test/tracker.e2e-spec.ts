@@ -8,6 +8,7 @@ import { AppModule, DB_NAME } from '../src/app.module.js';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Tracker } from '../src/tracker/schemas/tracker.schema.js';
 import { TrackerEvent } from '../src/tracker/event/schemas/event.schemas.js';
+import { configureApp } from '../src/bootstrap.js';
 
 describe('tracker API (e2e)', () => {
   let mongo: MongoMemoryServer;
@@ -24,6 +25,7 @@ describe('tracker API (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
+    configureApp(app);
     await app.init();
 
     client = await MongoClient.connect(process.env.MONGODB_URI);
@@ -71,6 +73,51 @@ describe('tracker API (e2e)', () => {
         type: 'category',
         summary: [],
       });
+    });
+
+    it('rejects a missing name with 400', async () => {
+      const response = await request(app.getHttpServer())
+        .post('/tracker')
+        .send({ type: 'counter' })
+        .expect(400);
+      expect(response.body.statusCode).toBe(400);
+    });
+
+    it('rejects a non-string name with 400', async () => {
+      await request(app.getHttpServer())
+        .post('/tracker')
+        .send({ name: 42, type: 'counter' })
+        .expect(400);
+    });
+
+    it('rejects an unknown tracker type with 400', async () => {
+      const response = await request(app.getHttpServer())
+        .post('/tracker')
+        .send({ name: 'Steps', type: 'mood' })
+        .expect(400);
+      expect(response.body.statusCode).toBe(400);
+
+      expect(await trackers.countDocuments({})).toBe(0);
+    });
+
+    it('rejects a missing tracker type with 400', async () => {
+      await request(app.getHttpServer())
+        .post('/tracker')
+        .send({ name: 'Steps' })
+        .expect(400);
+    });
+
+    it('drops additional data', async () => {
+      const response = await request(app.getHttpServer())
+        .post('/tracker')
+        .send({ name: 'Steps', type: 'counter', someOther: 'Data' })
+        .expect(201);
+
+      const trackerId = response.body.id;
+      const createdTracker = (await trackers.findOne(
+        new ObjectId(trackerId),
+      )) as any;
+      expect(createdTracker?.somOther).toBeUndefined();
     });
   });
 
@@ -174,6 +221,26 @@ describe('tracker API (e2e)', () => {
         .patch(`/tracker/${new ObjectId()}`)
         .send({ name: 'Daily Steps' })
         .expect(404);
+    });
+
+    it('rejects an unknown tracker type with 400', async () => {
+      const insertedTracker = await trackers.insertOne({
+        name: 'Steps',
+        type: 'counter',
+        summary: { sum: 10 },
+      });
+      const trackerId = insertedTracker.insertedId;
+
+      const response = await request(app.getHttpServer())
+        .patch(`/tracker/${trackerId}`)
+        .send({ type: 'mood' })
+        .expect(400);
+      expect(response.body.statusCode).toBe(400);
+
+      const tracker = await trackers.findOne({
+        _id: trackerId,
+      });
+      expect(tracker?.type).toBe('counter');
     });
   });
 

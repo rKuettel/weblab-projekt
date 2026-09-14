@@ -24,4 +24,5 @@
 | 13. Sept  | 1h      | Event List Komponenten überarbeitet                                                           |
 | 13. Sept  | 3h      | Überarbeitung/vereinheitlichung der statistik ansichten                                       |
 | 14. Sept  | 0.5h    | Einfache vorschläge von Kategorien in Event fomular mit DataList implementiert                |
-| **Total** | 60.5h   |                                                                                               |
+| 14. Sept  | 1.5h    | Validation im Backend mit class-validator implementiert                                       |
+| **Total** | 62.0h   |                                                                                               |

@@ -21,7 +21,12 @@ export class Tracker {
   summary: TrackerSummary;
 }
 
-export type TrackerType = 'counter' | 'category';
+export const TRACKER_TYPES = {
+  counter: 'counter',
+  category: 'category',
+} as const;
+
+export type TrackerType = (typeof TRACKER_TYPES)[keyof typeof TRACKER_TYPES];
 export type TrackerSummary = CounterTrackerSummary | CategoryTrackerSummary;
 
 export class CounterTrackerSummary {

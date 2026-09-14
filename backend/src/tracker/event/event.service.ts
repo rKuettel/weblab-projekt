@@ -19,11 +19,8 @@ export class EventService {
     @InjectModel(TrackerEvent.name) private eventModel: Model<TrackerEvent>,
   ) {}
 
-  async create(trackerId: string, createEventDto: CreateEventDto) {
-    const tracker = await this.trackerModel.findById(trackerId).exec();
-    if (!tracker) {
-      throw new NotFoundException(`Tracker with id ${trackerId} not found`);
-    }
+  async create(tracker: TrackerDocument, createEventDto: CreateEventDto) {
+    const trackerId = tracker._id;
     const event = new this.eventModel({
       trackerId,
       ...createEventDto,

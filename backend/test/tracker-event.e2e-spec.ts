@@ -8,6 +8,7 @@ import { INestApplication } from '@nestjs/common';
 import { App } from 'supertest/types.js';
 import { Test, TestingModule } from '@nestjs/testing';
 import { AppModule, DB_NAME } from '../src/app.module.js';
+import { configureApp } from '../src/bootstrap.js';
 
 describe('tracker event API (e2e)', () => {
   let mongo: MongoMemoryServer;
@@ -24,6 +25,7 @@ describe('tracker event API (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
+    configureApp(app);
     await app.init();
 
     client = await MongoClient.connect(process.env.MONGODB_URI);
@@ -93,7 +95,7 @@ describe('tracker event API (e2e)', () => {
 
   describe('POST /tracker/:trackerId/event', () => {
     it('creates a counter event and returns the tracker with the incremented summary', async () => {
-      const trackerId = await insertTracker();
+      const trackerId = await insertTracker('counter');
 
       const response = await request(app.getHttpServer())
         .post(`/tracker/${trackerId}/event`)
@@ -115,6 +117,21 @@ describe('tracker event API (e2e)', () => {
         data: { delta: 5 },
       });
       expect(stored?.timestamp).toEqual(new Date('2024-01-01T02:00:00.000Z'));
+    });
+
+    it('rejects category event data on a counter tracker with 400', async () => {
+      const trackerId = await insertTracker('counter');
+
+      const response = await request(app.getHttpServer())
+        .post(`/tracker/${trackerId}/event`)
+        .send({
+          timestamp: '2024-01-01T02:00:00.000Z',
+          data: { category: 'Drinks', amount: 5 },
+        })
+        .expect(400);
+      expect(response.body.statusCode).toBe(400);
+
+      expect(await events.countDocuments({})).toBe(0);
     });
 
     it('creates a category event and returns the tracker with updated summary', async () => {
@@ -141,6 +158,21 @@ describe('tracker event API (e2e)', () => {
       });
       expect(stored?.timestamp).toEqual(new Date('2024-01-01T02:00:00.000Z'));
     });
+  });
+
+  it('rejects counter event data on a category tracker with 400', async () => {
+    const trackerId = await insertTracker('category');
+
+    const response = await request(app.getHttpServer())
+      .post(`/tracker/${trackerId}/event`)
+      .send({
+        timestamp: '2024-01-01T02:00:00.000Z',
+        data: { delta: 5 },
+      })
+      .expect(400);
+    expect(response.body.statusCode).toBe(400);
+
+    expect(await events.countDocuments({})).toBe(0);
   });
 
   describe('GET /tracker/:trackerId/event', () => {

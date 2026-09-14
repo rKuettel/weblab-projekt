@@ -4,6 +4,7 @@ import { EventController } from './event.controller.js';
 import { Tracker, TrackerSchema } from '../schemas/tracker.schema.js';
 import { MongooseModule } from '@nestjs/mongoose';
 import { TrackerEvent, TrackerEventSchema } from './schemas/event.schemas.js';
+import { TrackerService } from '../tracker.service.js';
 
 @Module({
   controllers: [EventController],
@@ -13,6 +14,6 @@ import { TrackerEvent, TrackerEventSchema } from './schemas/event.schemas.js';
       { name: TrackerEvent.name, schema: TrackerEventSchema },
     ]),
   ],
-  providers: [EventService],
+  providers: [EventService, TrackerService],
 })
 export class EventModule {}
