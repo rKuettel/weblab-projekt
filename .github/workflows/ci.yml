@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  ci:
+  frontend:
     runs-on: ubuntu-latest
 
     steps:
@@ -20,6 +20,7 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+        working-directory: frontend
 
       - name: Build Frontend
         run: pnpm build
@@ -29,6 +30,22 @@ jobs:
         run: pnpm test --watch=false
         working-directory: frontend
 
+  backend:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - uses: pnpm/setup@v2.1.0
+        with:
+          runtime: node@24
+          version: 11
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+        working-directory: backend
+
       - name: Build Backend
         run: pnpm build
         working-directory: backend
@@ -36,3 +53,24 @@ jobs:
       - name: Test Backend
         run: pnpm test:e2e
         working-directory: backend
+
+  e2e-test:
+    needs: [frontend, backend]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - uses: pnpm/setup@v2.1.0
+        with:
+          runtime: node@24
+          version: 11
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+        working-directory: e2e
+
+      - name: Run E2E tests
+        run: pnpm run e2e
+        working-directory: e2e

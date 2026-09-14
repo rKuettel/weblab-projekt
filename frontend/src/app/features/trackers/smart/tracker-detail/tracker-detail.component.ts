@@ -67,15 +67,18 @@ type Tabs = 'stats' | 'events';
       <h2>Tracker: {{ this.tracker.value()?.name || '' }}</h2>
       <div class="actions">
         <app-button
+          testId="edit-tracker-button"
           [text]="'tracker.edit' | translate"
           (clicked)="editDialogOpen.set(true)"
         ></app-button>
         <app-button
+          testId="add-event-button"
           variant="secondary"
           [text]="'event.add' | translate"
           (clicked)="addEventDialogOpen.set(true)"
         ></app-button>
         <app-button
+          testId="delete-tracker-button"
           [outlined]="true"
           variant="secondary"
           [text]="'tracker.delete' | translate"
@@ -118,6 +121,7 @@ type Tabs = 'stats' | 'events';
       }
     </div>
     <app-confirm-dialog
+      testId="delete-tracker-confirm-dialog"
       [title]="'tracker.confirmDelete' | translate"
       [text]="'tracker.confirmDeleteLong' | translate"
       [open]="deleteDialogOpen()"
@@ -126,8 +130,8 @@ type Tabs = 'stats' | 'events';
     ></app-confirm-dialog>
 
     <app-dialog
+      testId="edit-tracker-dialog"
       id="trackerEditDialog"
-      [title]="addEventDialogTitle()"
       [title]="'tracker.edit' | translate"
       [open]="editDialogOpen()"
       (onClose)="editDialogOpen.set(false)"
@@ -140,6 +144,7 @@ type Tabs = 'stats' | 'events';
     </app-dialog>
 
     <app-dialog
+      testId="add-event-dialog"
       id="eventAddDialog"
       [title]="addEventDialogTitle()"
       [open]="addEventDialogOpen()"

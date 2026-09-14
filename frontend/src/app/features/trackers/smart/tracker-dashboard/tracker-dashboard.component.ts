@@ -57,7 +57,7 @@ import { translate, TranslatePipe } from '@ngx-translate/core';
       <div class="header">
         <h2>Trackers</h2>
         <app-button
-          data-testid="add-tracker-btn"
+          testId="add-tracker-button"
           [text]="'tracker.add' | translate"
           (clicked)="this.isAddTrackerModalOpen.set(true)"
         ></app-button>
@@ -71,6 +71,7 @@ import { translate, TranslatePipe } from '@ngx-translate/core';
         }
 
         <app-dialog
+          testId="add-tracker-dialog"
           [title]="'tracker.add' | translate"
           [open]="isAddTrackerModalOpen()"
           (onClose)="isAddTrackerModalOpen.set(false)"
@@ -79,6 +80,7 @@ import { translate, TranslatePipe } from '@ngx-translate/core';
         </app-dialog>
 
         <app-dialog
+          testId="add-event-dialog"
           [title]="addEventModalTitle()"
           [open]="isAddEventModalOpen()"
           (onClose)="this.currentTracker.set(undefined)"

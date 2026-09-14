@@ -37,7 +37,7 @@ import { generateEventPerDay, groupBy, groupByDate, sumBy } from '../stats.util'
     </article>
     <article>
       <h3>{{ 'tracker.stats.category.total' | translate }}</h3>
-      <app-big-number [number]="sum()"></app-big-number>
+      <app-big-number testId="stats-total" [number]="sum()"></app-big-number>
     </article>
 
     <article class="wide-card">

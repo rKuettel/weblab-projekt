@@ -1,8 +1,9 @@
 # Web Programming Lab Projekt
 
-Repo für das Abchlussprojekt des Moduls Web Programming Lab
+Repo für das Abschlussprojekt des Moduls Web Programming Lab
 
 - [Projekt-Vorschlag](./projekt-vorschlag.md)
+  [Documentation](../../actions/workflows/docs.yml)
 
 ## Running Locally
 

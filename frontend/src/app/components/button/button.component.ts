@@ -26,6 +26,7 @@ export type ButtonType = 'button' | 'submit' | 'reset';
       [class]="variant()"
       [disabled]="disabled()"
       [attr.aria-label]="ariaLabel()"
+      [attr.data-testid]="testId()"
       (click)="clicked.emit()"
     >
       {{ text() }}
@@ -41,6 +42,7 @@ export class ButtonComponent {
   readonly type = input<ButtonType>('button');
   readonly disabled = input(false);
   readonly ariaLabel = input<string>();
+  readonly testId = input<string>();
 
   readonly clicked = output<void>();
 

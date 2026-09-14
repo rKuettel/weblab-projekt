@@ -15,6 +15,7 @@ import { Field, FormField } from '@angular/forms/signals';
       <label>
         {{ this.label() }}
         <input
+          [attr.data-testid]="testId()"
           [attr.list]="dataListId()"
           [type]="this.type()"
           [formField]="this.formField()"
@@ -41,6 +42,7 @@ export class InputComponent<T extends string | number> {
   readonly type = input.required<string>();
   readonly formField = input.required<Field<T>>();
   readonly dataListItems = input<string[]>();
+  readonly testId = input<string>();
 
   readonly change = output<void>();
 

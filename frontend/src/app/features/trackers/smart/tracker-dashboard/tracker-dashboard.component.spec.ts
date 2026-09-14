@@ -103,8 +103,8 @@ describe('TrackerDashboard', () => {
 
     const addBtn = fixture.debugElement
       .queryAll(By.directive(ButtonComponent))
-      .find((btn) => btn.attributes['data-testid'] === 'add-tracker-btn')?.componentInstance as
-      ButtonComponent | undefined;
+      .map((btn) => btn.componentInstance as ButtonComponent)
+      .find((btn) => btn.testId() === 'add-tracker-button');
     addBtn?.clicked.emit();
 
     fixture.detectChanges();

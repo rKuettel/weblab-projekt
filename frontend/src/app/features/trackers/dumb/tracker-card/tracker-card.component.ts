@@ -31,17 +31,19 @@ import { TrackerSummaryComponent } from '../tracker-summary/tracker-summary.comp
     }
   `,
   template: `
-    <article class="card">
+    <article class="card" data-testid="tracker-card">
       <h3>{{ tracker().name }}</h3>
       <app-tracker-summary [tracker]="tracker()"></app-tracker-summary>
       <div class="footer">
         <app-button
+          testId="view-tracker-button"
           [fullWidth]="true"
           [routerLink]="['tracker', this.tracker().id]"
           [text]="'tracker.view' | translate"
         >
         </app-button>
         <app-button
+          testId="add-event-button"
           [fullWidth]="true"
           (clicked)="addEvent()"
           variant="secondary"

@@ -15,7 +15,12 @@ import { Component, input, output } from '@angular/core';
     }
   `,
   template: `
-    <dialog closedby="closerequest" (close)="onClose.emit()" [open]="open()">
+    <dialog
+      closedby="closerequest"
+      (close)="onClose.emit()"
+      [open]="open()"
+      [attr.data-testid]="testId()"
+    >
       <article>
         <header>
           <button aria-label="Close" rel="prev" (click)="onClose.emit()"></button>
@@ -29,5 +34,6 @@ import { Component, input, output } from '@angular/core';
 export class DialogComponent {
   readonly title = input.required<string>();
   readonly open = input(false);
+  readonly testId = input<string>();
   readonly onClose = output<void>();
 }

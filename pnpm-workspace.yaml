@@ -1,9 +1,11 @@
 packages:
   - "frontend"
   - "backend"
+  - "e2e"
 injectWorkspacePackages: true
 allowBuilds:
   "@parcel/watcher": true
+  cypress: true
   esbuild: true
   lmdb: true
   mongodb-memory-server: true

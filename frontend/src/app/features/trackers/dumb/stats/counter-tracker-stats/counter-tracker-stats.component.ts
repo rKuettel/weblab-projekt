@@ -32,11 +32,11 @@ const MS_PER_DAY = 86_400_000;
   template: `
     <article>
       <h3>{{ 'tracker.stats.counter.total' | translate }}</h3>
-      <app-big-number [number]="sumInRange()"></app-big-number>
+      <app-big-number testId="stats-total" [number]="sumInRange()"></app-big-number>
     </article>
     <article>
       <h3>{{ 'tracker.stats.counter.dailyAvg' | translate }}</h3>
-      <app-big-number [number]="this.dailyAvg()"></app-big-number>
+      <app-big-number testId="stats-daily-average" [number]="this.dailyAvg()"></app-big-number>
     </article>
     <article class="wide-card">
       <h3>{{ 'tracker.stats.counter.heatmap' | translate }}</h3>

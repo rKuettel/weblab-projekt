@@ -24,13 +24,14 @@ import { Component, computed, input } from '@angular/core';
     }
   `,
   template: `
-    <span class="big-number" [style.font-size]="fontSize()">
+    <span class="big-number" [style.font-size]="fontSize()" [attr.data-testid]="testId()">
       {{ numberString() }}
     </span>
   `,
 })
 export class BigNumberComponent {
   readonly number = input.required<number>();
+  readonly testId = input<string>();
   readonly numberString = computed(() => this.number().toLocaleString());
 
   fontSize = computed(() => {

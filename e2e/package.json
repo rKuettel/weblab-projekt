@@ -1,0 +1,17 @@
+{
+  "name": "track-thing-e2e",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Web Lab E2E tests",
+  "packageManager": "pnpm@11.24.0",
+  "scripts": {
+    "up": "docker compose -p track-thing-e2e -f docker-compose.yaml up -d --build --wait",
+    "down": "docker compose -p track-thing-e2e -f docker-compose.yaml down -v",
+    "e2e": "pnpm run up && cypress run --browser chromium && pnpm run down",
+    "cypress:open": "cypress open"
+  },
+  "devDependencies": {
+    "cypress": "^16.0.0",
+    "typescript": "~6.0.3"
+  }
+}

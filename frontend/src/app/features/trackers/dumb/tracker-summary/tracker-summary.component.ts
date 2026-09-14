@@ -19,7 +19,7 @@ import { PieChartComponent } from '../../../../components/charts/pie-chart/pie-c
     @let tracker = this.tracker();
     @switch (tracker.type) {
       @case ('counter') {
-        <app-big-number [number]="tracker.summary.sum"></app-big-number>
+        <app-big-number testId="tracker-summary-number" [number]="tracker.summary.sum"></app-big-number>
       }
       @case ('category') {
         <app-pie-chart [data]="{ source: tracker.summary }"></app-pie-chart>

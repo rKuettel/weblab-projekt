@@ -25,7 +25,7 @@ import { TranslatePipe } from '@ngx-translate/core';
       event of [...this.events()].sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
       track event.id
     ) {
-      <article class="event" [attr.data-testid]="'event' + event.id">
+      <article class="event" [attr.data-testid]="'event-' + event.id">
         <header>
           @let timestamp = event.timestamp;
           <strong>{{ formatDate(timestamp) }}</strong>
@@ -39,7 +39,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 
         <ul class="event-data">
           @for (entry of entries(event.data); track $index) {
-            <li class="data-item">
+            <li class="data-item" data-testid="event-data-item">
               <span class="data-label">{{ entry[0] }}: </span>
               <span class="data-value">{{ entry[1] }}</span>
             </li>
@@ -49,6 +49,7 @@ import { TranslatePipe } from '@ngx-translate/core';
     }
 
     <app-confirm-dialog
+      testId="delete-event-confirm-dialog"
       [open]="this.dialogOpen()"
       (onClose)="eventIdToDelete.set(undefined)"
       (confirmed)="emitOnDelete()"

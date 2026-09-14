@@ -15,12 +15,14 @@ import { translate, TranslatePipe } from '@ngx-translate/core';
   template: `
     <div class="form">
       <app-input
+        testId="date-range-from"
         [label]="'dateRangeSelector.from' | translate"
         (change)="dateUpdated()"
         type="date"
         [formField]="dateRangeForm.from"
       ></app-input>
       <app-input
+        testId="date-range-to"
         [label]="'dateRangeSelector.to' | translate"
         (change)="dateUpdated()"
         type="date"

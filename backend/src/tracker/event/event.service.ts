@@ -7,10 +7,9 @@ import {
   TrackerDocument,
   TrackerSummary,
 } from '../schemas/tracker.schema.js';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { TrackerEvent } from './schemas/event.schemas.js';
-import { ObjectId } from 'mongodb';
 
 @Injectable()
 export class EventService {
@@ -77,7 +76,7 @@ export class EventService {
   ): Promise<CounterTrackerSummary> {
     const [result] = await this.eventModel
       .aggregate([
-        { $match: { trackerId: new ObjectId(trackerId) } },
+        { $match: { trackerId: new Types.ObjectId(trackerId) } },
         {
           $group: {
             _id: null,
@@ -95,7 +94,7 @@ export class EventService {
     trackerId: string,
   ): Promise<CategoryTrackerSummary> {
     const rows = await this.eventModel.aggregate([
-      { $match: { trackerId: new ObjectId(trackerId) } },
+      { $match: { trackerId: new Types.ObjectId(trackerId) } },
       {
         $group: {
           _id: '$data.category',

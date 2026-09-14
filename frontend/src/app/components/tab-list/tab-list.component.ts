@@ -28,6 +28,7 @@ export interface TabEntry {
         <div
           class="tab"
           [class.selected-tab]="tab.value === selectedTab()"
+          [attr.data-testid]="'tab-' + tab.value"
           (click)="changeTab(tab)"
         >
           {{ tab.translationId | translate }}

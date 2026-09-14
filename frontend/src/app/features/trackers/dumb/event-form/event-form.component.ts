@@ -18,14 +18,21 @@ import { Tracker } from '../../tracker.types';
   template: `
     <form class="tracker-form" (submit)="submitForm($event)">
       <app-input
+        testId="event-timestamp-input"
         label="Timestamp"
         type="datetime-local"
         [formField]="eventForm.timestamp"
       ></app-input>
 
-      <app-input label="Delta" type="number" [formField]="eventForm.couterData.delta"></app-input>
+      <app-input
+        testId="event-delta-input"
+        label="Delta"
+        type="number"
+        [formField]="eventForm.couterData.delta"
+      ></app-input>
 
       <app-input
+        testId="event-category-input"
         id="category"
         label="Category"
         type="string"
@@ -35,12 +42,14 @@ import { Tracker } from '../../tracker.types';
       </app-input>
 
       <app-input
+        testId="event-amount-input"
         label="Amount"
         type="number"
         [formField]="eventForm.categoryData.amount"
       ></app-input>
 
       <app-button
+        testId="event-form-submit"
         [text]="'button.submit' | translate"
         [fullWidth]="true"
         variant="primary"
