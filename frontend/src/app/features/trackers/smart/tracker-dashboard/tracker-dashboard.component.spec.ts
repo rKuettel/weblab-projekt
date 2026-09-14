@@ -159,7 +159,7 @@ describe('TrackerDashboard', () => {
 
     const form = fixture.debugElement.query(By.directive(EventFormComponent))
       .componentInstance as EventFormComponent;
-    expect(form?.trackerType()).toBe('counter');
+    expect(form.tracker()?.type).toBe('counter');
   });
 
   it('should add an event and update the tracker', async () => {

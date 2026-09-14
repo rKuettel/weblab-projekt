@@ -4,7 +4,10 @@ import { vi } from 'vitest';
 import { CreateTrackerEvent } from '../../events.types';
 import { EventFormComponent } from './event-form.component';
 import { inputBinding, signal } from '@angular/core';
-import { TrackerType } from '../../tracker.types';
+import { Tracker } from '../../tracker.types';
+import { makeCategoryTracker, makeCounterTracker } from '../../../../../../test/test-utils';
+import { By } from '@angular/platform-browser';
+import { InputComponent } from '../../../../components/input/input.component';
 const translations = {
   button: {
     submit: 'Submit',
@@ -12,14 +15,14 @@ const translations = {
 };
 
 describe('EventForm', () => {
-  async function setup(trackerType: TrackerType = 'counter') {
+  async function setup(tracker: Tracker = makeCounterTracker()) {
     await TestBed.configureTestingModule({
       imports: [EventFormComponent],
       providers: [provideTranslateService({ fallbackLang: 'en' })],
     }).compileComponents();
 
     const fixture = TestBed.createComponent(EventFormComponent, {
-      bindings: [inputBinding('trackerType', signal(trackerType))],
+      bindings: [inputBinding('tracker', signal(tracker))],
     });
     TestBed.inject(TranslateService).setTranslation('en', translations);
     fixture.detectChanges();
@@ -40,7 +43,7 @@ describe('EventForm', () => {
     input.dispatchEvent(new Event('change'));
   }
 
-  it('should render timestamp, delta and submit controls when couter event', async () => {
+  it('should render timestamp, delta and submit controls when couter tracker', async () => {
     const { fixture, inputs, submitButton } = await setup();
 
     const labels = fixture.nativeElement.querySelectorAll('label');
@@ -55,8 +58,8 @@ describe('EventForm', () => {
     expect(submitButton.disabled).toBe(false);
   });
 
-  it('should render timestamp, category, amount  and submit controls when category event', async () => {
-    const { fixture, inputs, submitButton } = await setup('category');
+  it('should render timestamp, category, amount  and submit controls when category tracker', async () => {
+    const { fixture, inputs, submitButton } = await setup(makeCategoryTracker());
 
     const labels = fixture.nativeElement.querySelectorAll('label');
     expect(labels[0].textContent).toContain('Timestamp');
@@ -71,6 +74,26 @@ describe('EventForm', () => {
 
     expect(submitButton.textContent?.trim()).toBe('Submit');
     expect(submitButton.disabled).toBe(false);
+  });
+
+  it('should use categories in summary as list for categories input', async () => {
+    const { fixture } = await setup(
+      makeCategoryTracker({
+        summary: [
+          {
+            category: 'Test1',
+            amount: 0,
+          },
+          { category: 'Test2', amount: 1 },
+        ],
+      }),
+    );
+
+    const categoryInput = fixture.debugElement
+      .queryAll(By.directive(InputComponent))
+      .find((i) => i.attributes['id'] === 'category')?.componentInstance as InputComponent<string>;
+
+    expect(categoryInput.dataListItems()).toEqual(['Test1', 'Test2']);
   });
 
   it('should emit the entered counter event on submit', async () => {
@@ -91,7 +114,7 @@ describe('EventForm', () => {
   });
 
   it('should emit the entered category event on submit', async () => {
-    const { component, inputs, submitButton } = await setup('category');
+    const { component, inputs, submitButton } = await setup(makeCategoryTracker());
     const onFormSubmit = vi.fn();
     component.onFormSubmit.subscribe(onFormSubmit);
 

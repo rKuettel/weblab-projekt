@@ -1,4 +1,4 @@
-import { Component, input, output, signal } from '@angular/core';
+import { Component, computed, input, output, signal } from '@angular/core';
 import {
   CategoryEventData,
   CounterEventData,
@@ -9,7 +9,7 @@ import { form, FormField, hidden } from '@angular/forms/signals';
 import { InputComponent } from '../../../../components/input/input.component';
 import { ButtonComponent } from '../../../../components/button/button.component';
 import { TranslatePipe } from '@ngx-translate/core';
-import { TrackerType } from '../../tracker.types';
+import { Tracker } from '../../tracker.types';
 
 @Component({
   imports: [InputComponent, ButtonComponent, FormField, TranslatePipe],
@@ -26,10 +26,13 @@ import { TrackerType } from '../../tracker.types';
       <app-input label="Delta" type="number" [formField]="eventForm.couterData.delta"></app-input>
 
       <app-input
+        id="category"
         label="Category"
         type="string"
+        [dataListItems]="availableCategories()"
         [formField]="eventForm.categoryData.category"
-      ></app-input>
+      >
+      </app-input>
 
       <app-input
         label="Amount"
@@ -48,15 +51,22 @@ import { TrackerType } from '../../tracker.types';
   `,
 })
 export class EventFormComponent {
-  readonly trackerType = input.required<TrackerType>();
-  readonly onFormSubmit = output<CreateTrackerEvent>();
+  readonly tracker = input<Tracker>();
+  readonly availableCategories = computed(() => {
+    const tracker = this.tracker();
+    if (tracker?.type === 'category') {
+      return tracker.summary.map((c) => c.category);
+    }
+    return undefined;
+  });
 
+  readonly onFormSubmit = output<CreateTrackerEvent>();
   private readonly eventModel = signal<EventFormModel>({ ...DEFAULT_TRACKEREVENT });
 
   readonly eventForm = form(this.eventModel, (path) => {
-    hidden(path.categoryData.amount, { when: ({}) => this.trackerType() !== 'category' });
-    hidden(path.categoryData.category, { when: ({}) => this.trackerType() !== 'category' });
-    hidden(path.couterData, { when: ({}) => this.trackerType() !== 'counter' });
+    hidden(path.categoryData.amount, { when: ({}) => this.tracker()?.type !== 'category' });
+    hidden(path.categoryData.category, { when: ({}) => this.tracker()?.type !== 'category' });
+    hidden(path.couterData, { when: ({}) => this.tracker()?.type !== 'counter' });
   });
 
   submitForm(event: Event) {
@@ -78,8 +88,8 @@ export class EventFormComponent {
     const timestamp: Date = new Date(model.timestamp);
 
     let data: TrackerEventData;
-    const eventType = this.trackerType();
-    if (eventType === 'counter') {
+    const trackerType = this.tracker()?.type;
+    if (trackerType === 'counter') {
       data = model.couterData;
     } else {
       data = model.categoryData;

@@ -23,4 +23,5 @@
 | 13. Sept  | 1.5h    | Auslagerung von Events und Statisiken in seperate tabs auf der Detail Page                    |
 | 13. Sept  | 1h      | Event List Komponenten überarbeitet                                                           |
 | 13. Sept  | 3h      | Überarbeitung/vereinheitlichung der statistik ansichten                                       |
-| **Total** | 60h     |                                                                                               |
+| 14. Sept  | 0.5h    | Einfache vorschläge von Kategorien in Event fomular mit DataList implementiert                |
+| **Total** | 60.5h   |                                                                                               |

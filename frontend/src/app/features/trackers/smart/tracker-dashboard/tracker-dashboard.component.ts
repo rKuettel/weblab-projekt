@@ -84,7 +84,7 @@ import { translate, TranslatePipe } from '@ngx-translate/core';
           (onClose)="this.currentTracker.set(undefined)"
         >
           <app-event-form
-            [trackerType]="currentTracker()?.type ?? 'counter'"
+            [tracker]="currentTracker()"
             (onFormSubmit)="addEvent($event)"
           ></app-event-form>
         </app-dialog>

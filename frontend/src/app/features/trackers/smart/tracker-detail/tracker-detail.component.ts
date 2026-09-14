@@ -146,7 +146,7 @@ type Tabs = 'stats' | 'events';
       (onClose)="addEventDialogOpen.set(false)"
     >
       <app-event-form
-        [trackerType]="tracker.value()?.type ?? 'counter'"
+        [tracker]="tracker.value()"
         (onFormSubmit)="addEvent($event)"
       ></app-event-form>
     </app-dialog>
@@ -161,7 +161,7 @@ export class TrackerDetailComponent {
     requireSync: true,
   });
 
-  public readonly tabs: TabEntry[] = [
+  readonly tabs: TabEntry[] = [
     {
       translationId: 'tracker.tab.stats',
       value: 'stats',
@@ -171,21 +171,28 @@ export class TrackerDetailComponent {
       value: 'events',
     },
   ];
-  public readonly currentTab = computed<Tabs>(() => {
+  readonly currentTab = computed<Tabs>(() => {
     const tab = this.routeQueryParams().get('tab');
     return (tab ?? 'stats') as Tabs;
   });
 
-  public readonly trackerId = signal(this.activatedRoute.snapshot.params['id']);
+  readonly trackerId = signal(this.activatedRoute.snapshot.params['id']);
 
   readonly deleteDialogOpen = signal(false);
   readonly editDialogOpen = signal(false);
 
   readonly addEventDialogOpen = signal(false);
-  public addEventTranslated = translate('event.add');
-  public addEventDialogTitle = computed<string>(() => {
+  readonly addEventTranslated = translate('event.add');
+  readonly addEventDialogTitle = computed<string>(() => {
     const currentTracker = this.tracker.value()?.name ?? '';
     return `${this.addEventTranslated()}: ${currentTracker}`;
+  });
+  readonly availableCategories = computed(() => {
+    const tracker = this.tracker.value();
+    if (tracker?.type === 'category') {
+      return tracker.summary.map((c) => c.category);
+    }
+    return undefined;
   });
 
   public queryDateRange = computed<DateRange>(() => {
