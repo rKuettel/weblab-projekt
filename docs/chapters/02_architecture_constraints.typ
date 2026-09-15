@@ -1,23 +1,20 @@
-// tag::DE[]
-#import "../lib.typ": arc42help
 = Randbedingungen <section-architecture-constraints>
 
-#arc42help[
-  *Inhalt*
+Die Randbedingungen ergeben sich vor allem aus den Mindestanforderungen des
+Moduls (Web Programming Lab).
 
-  Randbedingungen und Vorgaben, die ihre Freiheiten bezüglich Entwurf, Implementierung oder Ihres Entwicklungsprozesses einschränken.
-  Diese Randbedingungen gelten manchmal organisations- oder firmenweit über die Grenzen einzelner Systeme hinweg.
+#table(
+  columns: (1fr, 2fr),
+  table.header[*Randbedingung*][*Erläuterung*],
+  [Mobile/Tablet-optimiert],
+  [Die Applikation soll neben der Desktop-Ansicht auch für die Mobile/Tablet-Ansicht optimiert sein],
 
-  *Motivation*
+  [Automatisierte Tests],
+  [Die Funktionalitäten sollen mittels sinnvoller automatisierter Unit-/Integration-/E2E-Tests überprüft werden],
 
-  Für eine tragfähige Architektur sollten Sie genau wissen, wo Ihre Freiheitsgrade bezüglich der Entwurfsentscheidungen liegen und wo Sie Randbedingungen beachten müssen.
-  Sie können Randbedingungen vielleicht noch verhandeln, zunächst sind sie aber da.
+  [Lighthouse-Score ≥ 90], [Lighthouse-Score von mindestens 90 (Durchschnitt aller Analysen) für Mobile sowie Desktop],
 
-  *Form*
-
-  Einfache Tabellen der Randbedingungen mit Erläuterungen.
-  Bei Bedarf unterscheiden Sie technische, organisatorische und politische Randbedingungen oder übergreifende Konventionen (beispielsweise Programmier- oder Versionierungsrichtlinien, Dokumentations- oder Namenskonvention).
-
-  _Weiterführende Informationen:_ Siehe #link("https://docs.arc42.org/section-2/")[Randbedingungen] in der online-Dokumentation (auf Englisch!).
-]
-// end::DE[]
+  [Reproduzierbarer Prod-Start], [Das Prod-Bundle soll reproduzierbar gestartet werden können],
+  [JavaScript/TypeScript für Frontend und Backend],
+  [Das Modul schreibt JavaScript/TypeScript für Frontend und Backend vor],
+)

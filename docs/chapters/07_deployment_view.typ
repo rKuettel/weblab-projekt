@@ -1,77 +1,61 @@
-// tag::DE[]
-#import "../lib.typ": arc42help
 = Verteilungssicht <section-deployment-view>
 
-#arc42help[
-  *Inhalt*
+== Produktion (Docker Compose)
 
-  Die Verteilungssicht beschreibt:
+`docker-compose.yaml` (Repo-Root) setzt den kompletten Stack aus drei Containern auf
+einem Docker-Host auf. nginx ist der einzige nach aussen exponierte Port.
 
-  + die technische Infrastruktur, auf der Ihr System ausgeführt wird, mit Infrastrukturelementen wie Standorten, Umgebungen, Rechnern, Prozessoren, Kanälen und Netztopologien sowie sonstigen Bestandteilen, und
-  + die Abbildung von (Software-)Bausteinen auf diese Infrastruktur.
+```mermaid
+flowchart LR
+  U(["Benutzer-Browser"])
+  subgraph Host["Docker-Host (docker-compose.yaml)"]
+    subgraph FE["frontend (nginx:alpine)"]
+      NG["nginx, Port 80\n→ Host-Port 8080"]
+    end
+    subgraph BE["backend (node:alpine)"]
+      ND["NestJS API, Port 3000\n(nur intern)"]
+    end
+    subgraph MG["mongo (mongo:7)"]
+      MN["MongoDB, Port 27017\n(nur intern)"]
+    end
+  end
+  U -- "http://localhost:8080" --> NG
+  NG -- "/api/* Reverse-Proxy" --> ND
+  ND -- "Mongoose" --> MN
+```
 
-  Häufig laufen Systeme in unterschiedlichen Umgebungen, beispielsweise Entwicklung-/Test- oder Produktionsumgebungen.
-  In solchen Fällen sollten Sie alle relevanten Umgebungen aufzeigen.
+nginx liefert die statischen SPA-Assets aus und proxyt `/api/*`
+auf das Backend. Dadurch gibt es genau einen Entry Point und kein CORS.
+MongoDB wird bewusst nicht auf den Host gemappt, das nur das Backend darf darauf zugreifen kann.
 
-  Nutzen Sie die Verteilungssicht insbesondere dann, wenn Ihre Software auf mehr als einem Rechner, Prozessor, Server oder Container abläuft oder Sie Ihre Hardware sogar selbst konstruieren.
+== Entwicklungsumgebung
 
-  Aus Softwaresicht genügt es, auf die Aspekte zu achten, die für die Softwareverteilung relevant sind.
-  Insbesondere bei der Hardwareentwicklung kann es notwendig sein, die Infrastruktur mit beliebigen Details zu beschreiben.
+```mermaid
+flowchart LR
+  BR(["Browser"])
+  NGX["Frontend\n ng serve, Port 4200 \n"]
+  ND["nest start --watch\n Port 3000"]
+  subgraph Docker["docker-compose.develop.yaml"]
+    MN[("MongoDB\n  Port 27017")]
+    MK["Mongoku\n Port 3100"]
+  end
+  BR --> NGX
+  NGX -- "/api/* Reverse-Proxy" --> ND
+  ND --> MN
+  BR -- "(DB-Inspektion)" --> MK
+  MK --> MN
+```
 
-  *Motivation*
+Für die Entwicklung läuft nur MongoDB (inkl. Mongoku als
+Web-Inspektionstool) in Docker. Frontend und Backend laufen nativ im Watch-Modus
+für schnelle Iteration (`pnpm start` am Workspace-Root startet beide parallel).
+Der Dev-Server-Proxy (`config/proxy.conf.json`) spiegelt das nginx-Setup der
+Produktion.
 
-  Software läuft nicht ohne Infrastruktur.
-  Diese zugrundeliegende Infrastruktur beeinflusst Ihr System und/oder querschnittliche Lösungskonzepte, daher müssen Sie diese Infrastruktur kennen.
+== E2E-Testumgebung
 
-  *Form*
+`e2e/docker-compose.yaml` baut dieselben Images wie die Produktion und startet sie
+temporär (`pnpm e2e` in `e2e/`). Cypress (Chromium) testet gegen
+`http://localhost:8080` und reist die Umgebung danach ab. Damit testen E2E-Tests
+exakt das, was in der Produktion läuft.
 
-  Das oberste Verteilungsdiagramm könnte bereits in Ihrem technischen Kontext enthalten sein, mit Ihrer Infrastruktur als EINE Blackbox.
-  Jetzt zoomen Sie in diese Infrastruktur mit weiteren Verteilungsdiagrammen hinein:
-
-  - Die UML stellt mit Verteilungsdiagrammen (Deployment diagrams) eine Diagrammart zur Verfügung, um diese Sicht auszudrücken. Nutzen Sie diese, evtl. auch geschachtelt, wenn Ihre Verteilungsstruktur es verlangt.
-  - Falls Ihre Infrastruktur-Stakeholder andere Diagrammarten bevorzugen, die beispielsweise Prozessoren und Kanäle zeigen, sind diese hier ebenfalls einsetzbar.
-
-  _Weiterführende Informationen:_ Siehe #link("https://docs.arc42.org/section-7/")[Verteilungssicht] in der online-Dokumentation (auf Englisch!).
-]
-
-== Infrastruktur Ebene 1
-
-#arc42help[
-  An dieser Stelle beschreiben Sie (als Kombination von Diagrammen mit Tabellen oder Texten):
-
-  - die Verteilung des Gesamtsystems auf mehrere Standorte, Umgebungen, Rechner, Prozessoren o. Ä., sowie die physischen Verbindungskanäle zwischen diesen,
-  - wichtige Begründungen für diese Verteilungsstruktur,
-  - Qualitäts- und/oder Leistungsmerkmale dieser Infrastruktur,
-  - Zuordnung von Softwareartefakten zu Bestandteilen der Infrastruktur
-
-  Für mehrere Umgebungen oder alternative Deployments kopieren Sie diesen Teil von arc42 für alle wichtigen Umgebungen/Varianten.
-]
-
-_*\<Übersichtsdiagramm>*_
-
-/ Begründung: _\<Erläuternder Text>_
-
-/ Qualitäts- und/oder Leistungsmerkmale: _\<Erläuternder Text>_
-
-/ Zuordnung von Bausteinen zu Infrastruktur: _\<Beschreibung der Zuordnung>_
-
-== Infrastruktur Ebene 2
-
-#arc42help[
-  An dieser Stelle können Sie den inneren Aufbau (einiger) Infrastrukturelemente aus Ebene 1 beschreiben.
-
-  Für jedes Infrastrukturelement kopieren Sie die Struktur aus Ebene 1.
-]
-
-=== _\<Infrastrukturelement 1>_
-
-_\<Diagramm + Erläuterungen>_
-
-=== _\<Infrastrukturelement 2>_
-
-_\<Diagramm + Erläuterungen>_
-
-=== _\<Infrastrukturelement n>_
-
-_\<Diagramm + Erläuterungen>_
-// end::DE[]

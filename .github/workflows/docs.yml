@@ -35,7 +35,7 @@ jobs:
         uses: softprops/action-gh-release@v3
         with:
           tag_name: latest
-          name: Latest documentation
+          name: Architektur Dokumentation
           files: weblab-documentation.pdf
           overwrite_files: true
           prerelease: false

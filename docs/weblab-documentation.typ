@@ -1,28 +1,24 @@
-// arc42 Template in Typst format
-// Version 9.1-DE, Dezember 2025
+// Track Thing – arc42 Dokumentation
+// Template: arc42 Version 9.1-DE, Dezember 2025
 // (basiert auf der AsciiDoc Version)
-//
-// Created, maintained and (C) by Dr. Peter Hruschka, Dr. Gernot Starke and contributors.
 // See https://arc42.org
 
-// ============================================================
-// Configuration
-// ============================================================
-
-#import "lib.typ": arc42help, show-arc42-help
+#import "lib.typ": *
 
 // ============================================================
 // Document setup
 // ============================================================
 
 #set document(
-  title: "Web Programming Lab Documentation",
-  author: ("Dr. Peter Hruschka", "Dr. Gernot Starke"),
+  title: "Track Thing – arc42 Dokumentation",
+  author: "Web Programming Lab, Hochschule Luzern",
 )
 
 #set text(lang: "de", region: "ch", font: "Libertinus Serif", size: 11pt)
 #set heading(numbering: "1.1")
 #set par(justify: true)
+
+#show raw.where(lang: "mermaid"): show-mermaid-blocks(width: 100%)
 
 // ============================================================
 // Title page
@@ -31,11 +27,11 @@
 #align(center)[
   #image("images/arc42-logo.png", width: 30%)
   #v(1em)
-  #text(size: 24pt, weight: "bold")[arc42 Template]
+  #text(size: 24pt, weight: "bold")[Track Thing]
   #v(0.5em)
-  #text(size: 12pt)[Version 9.1-DE \
-    Dezember 2025 \
-    (basiert auf der AsciiDoc Version)]
+  #text(size: 14pt)[Tracking-/Statistik-Applikation \
+    arc42 Dokumentation \
+    Web Programming Lab, Hochschule Luzern]
 ]
 
 #v(2em)
@@ -48,26 +44,12 @@
 
 #text(size: 12pt)[arc42, das Template zur Dokumentation von Software- und Systemarchitekturen.]
 
-Template Version 9.1-DE. (basiert auf der AsciiDoc Version), Dezember 2025
+Template Version 9.1-DE (basiert auf der AsciiDoc Version), Dezember 2025.
 
 Created, maintained and (C) by Dr. Peter Hruschka, Dr. Gernot Starke and contributors.
 Siehe #link("https://arc42.org").
 
 #line(length: 100%)
-
-#if show-arc42-help {
-  block(
-    width: 100%,
-    inset: 12pt,
-    stroke: 0.5pt + luma(180),
-    fill: luma(245),
-    radius: 4pt,
-  )[
-    *Hinweis:* Diese Version des Templates enthält Hilfen und Erläuterungen.
-    Sie dient der Einarbeitung in arc42 sowie dem Verständnis der Konzepte.
-    Für die Dokumentation eigener System verwenden Sie besser die _plain_ Version.
-  ]
-}
 
 // ============================================================
 // Table of contents

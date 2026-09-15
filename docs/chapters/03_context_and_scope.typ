@@ -1,76 +1,35 @@
-// tag::DE[]
-#import "../lib.typ": arc42help
 = Kontextabgrenzung <section-context-and-scope>
 
-#arc42help[
-  *Inhalt*
 
-  Die Kontextabgrenzung grenzt das System gegen alle Kommunikationspartner (Nachbarsysteme und Benutzerrollen) ab.
-  Sie legt damit die externen Schnittstellen fest und zeigt damit auch die Verantwortlichkeit (scope) Ihres Systems: Welche Verantwortung trägt das System und welche Verantwortung übernehmen die Nachbarsysteme?
+Track Thing kommuniziert ausschliesslich mit dem Benutzer. Es existieren keine anderen Nachbarsysteme.
 
-  Differenzieren Sie fachlichen (Ein- und Ausgaben) und technischen Kontext (Kanäle, Protokolle, Hardware), falls nötig.
-
-  *Motivation*
-
-  Die fachlichen und technischen Schnittstellen zur Kommunikation gehören zu den kritischsten Aspekten eines Systems.
-  Stellen Sie sicher, dass Sie diese komplett verstanden haben.
-
-  *Form*
-
-  Verschiedene Optionen:
-
-  - Diverse Kontextdiagramme
-  - Listen von Kommunikationsbeziehungen mit deren Schnittstellen
-
-  _Weiterführende Informationen:_ Siehe #link("https://docs.arc42.org/section-3/")[Kontextabgrenzung] in der online-Dokumentation (auf Englisch!).
-]
-
-== Fachlicher Kontext
-
-#arc42help[
-  *Inhalt*
-
-  Festlegung *aller* Kommunikationsbeziehungen (Nutzer, IT-Systeme, ...) mit Erklärung der fachlichen Ein- und Ausgabedaten oder Schnittstellen.
-  Zusätzlich (bei Bedarf) fachliche Datenformate oder Protokolle der Kommunikation mit den Nachbarsystemen.
-
-  *Motivation*
-
-  Alle Beteiligten müssen verstehen, welche fachlichen Informationen mit der Umwelt ausgetauscht werden.
-
-  *Form*
-
-  Alle Diagrammarten, die das System als Blackbox darstellen und die fachlichen Schnittstellen zu den Nachbarsystemen beschreiben.
-
-  Alternativ oder ergänzend können Sie eine Tabelle verwenden.
-  Der Titel gibt den Namen Ihres Systems wieder; die drei Spalten sind: Kommunikationsbeziehung, Eingabe, Ausgabe.
-]
-
-*\<Diagramm und/oder Tabelle>*
-
-*\<optional: Erläuterung der externen fachlichen Schnittstellen>*
+```mermaid
+flowchart LR
+  U(["Benutzer"])
+  TS["Track Thing"]
+  U -- "Tracker anlegen \n bearbeiten \n löschen" --> TS
+  TS -- "Dashboard aller \n Tracker" --> U
+  U -- "Ereignisse erfassen \n löschen" --> TS
+  TS -- "Event-Liste \n Statistiken" --> U
+```
 
 == Technischer Kontext
 
-#arc42help[
-  *Inhalt*
+Der Benutzer interagiert über den Browser mit Track Thing. Der Browser lädt die statischen
+Assets (Angular-SPA) von nginx und ruft die REST-API über den gleichen
+Entry Point (`/api/*`) auf. nginx leitet API-Requests an das NestJS-Backend
+weiter, welches per Mongoose-Driver mit MongoDB kommuniziert.
 
-  Technische Schnittstellen (Kanäle, Übertragungsmedien) zwischen dem System und seiner Umwelt.
-  Zusätzlich eine Erklärung (_mapping_), welche fachlichen Ein- und Ausgaben über welche technischen Kanäle fließen.
-
-  *Motivation*
-
-  Viele Stakeholder treffen Architekturentscheidungen auf Basis der technischen Schnittstellen des Systems zu seinem Kontext.
-
-  Insbesondere bei der Entwicklung von Infrastruktur oder Hardware sind diese technischen Schnittstellen durchaus entscheidend.
-
-  *Form*
-
-  Beispielsweise UML Deployment-Diagramme mit den Kanälen zu Nachbarsystemen, begleitet von einer Tabelle, die Kanäle auf Ein-/Ausgaben abbildet.
-]
-
-*\<Diagramm oder Tabelle>*
-
-*\<optional: Erläuterung der externen technischen Schnittstellen>*
-
-*\<Mapping fachliche auf technische Schnittstellen>*
-// end::DE[]
+```mermaid
+flowchart LR
+  U(["Benutzer"])
+  B["Browser"]
+  NG["nginx\nstatische Assets + Reverse-Proxy"]
+  API["NestJS REST API\nNode.js"]
+  MG[("MongoDB")]
+  U --> B
+  NG -- "HTTP: HTML/JS/CSS" --> B
+  B <-- "HTTP/JSON: /api/*" --> NG
+  NG <-- "HTTP/JSON" --> API
+  API <--> MG
+```

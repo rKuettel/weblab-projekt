@@ -15,7 +15,7 @@ Neben dem Erstellen von Trackern und dem Erfassen von Ereignissen soll die Appli
 - Als Benutzer möchte ich verschiedene Tracker-Typen auswählen können, damit ich unterschiedliche Arten von Informationen erfassen kann.
 - Als Benutzer möchte ich einfache Zähler-Tracker erstellen können, damit ich beispielsweise die Anzahl von etwas hochzählen kann.
 - Als Benutzer möchte ich erfasste Ereignisse abrufen können, damit ich nachvollziehen kann, welche Ereignisse ich wann erfasst habe.
-- Als Benutzer möchte ich meine erfassten Ereignisse nachträglich bearbeiten oder löschen können, damit ich Fehleingaben korrigieren kann.
+- Als Benutzer möchte ich meine erfassten Ereignisse nachträglich löschen können, damit ich Fehleingaben korrigieren kann.
 - Als Benutzer möchte ich Statistiken zu meinen Trackern anzeigen können, damit ich Entwicklungen und Trends erkennen kann.
 
 ### Should Have

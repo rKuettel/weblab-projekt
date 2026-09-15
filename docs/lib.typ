@@ -1,6 +1,7 @@
-// arc42 Template shared configuration
+#import "@preview/merman:0.3.0": show-mermaid-blocks
+// Track Thing documentation shared configuration
 // Set to true to show arc42 help texts, false to hide them
-#let show-arc42-help = true
+#let show-arc42-help = false
 
 // arc42help function: renders help blocks conditionally
 #let arc42help(content) = {
@@ -15,3 +16,5 @@
     )
   }
 }
+
+#show raw.where(lang: "mermaid"): show-mermaid-blocks(width: 100%)
