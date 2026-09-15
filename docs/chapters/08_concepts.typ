@@ -1,54 +1,96 @@
-// tag::DE[]
-#import "../lib.typ": arc42help
 = Querschnittliche Konzepte <section-concepts>
 
-#arc42help[
-  *Inhalt*
 
-  Dieser Abschnitt beschreibt übergreifende, prinzipielle Regelungen und Lösungsansätze, die an mehreren Stellen (=_querschnittlich_) relevant sind.
+=== Datenmodell
 
-  Solche Konzepte betreffen oft mehrere Bausteine.
-  Dazu können vielerlei Themen gehören, wie beispielsweise die Themen aus dem nachfolgenden Diagramm:
+Zwei Dokumente bilden das gesamte Fachmodell (Details: ADR 4, ADR 5):
 
-  #figure(
-    image("../images/08-concepts-DE.drawio.png", width: 100%),
-    caption: [Mögliche Themen für querschnittliche Konzepte],
-  )
+```mermaid
+erDiagram
+  TRACKERS {
+    ObjectId _id PK
+    string name
+    string type "counter | category"
+    object summary "typabhängig, cached"
+  }
+  TRACKEREVENTS {
+    ObjectId _id PK
+    ObjectId trackerId FK "indexiert"
+    date timestamp
+    object data "typabhängig"
+  }
+  TRACKERS ||--o{ TRACKEREVENTS : "enthält"
+```
 
-  *Motivation*
+Die typabhängigen Felder sind bewusst flexibel gespeichert (Mongoose `Mixed`/`Map`) und
+werden an der API-Grenze validiert:
 
-  Konzepte bilden die Grundlage für _konzeptionelle Integrität_ (Konsistenz, Homogenität) der Architektur und damit eine wesentliche Grundlage für die innere Qualität Ihrer Systeme.
+#table(
+  columns: (1.2fr, 1.2fr, 2fr),
+  table.header[][*Counter*][*Category*],
+  [`tracker.summary`], [`{ sum: number }`], [`[{ category: string, amount: number }]`],
+  [`event.data`], [`{ delta: number }`], [`{ category: string, amount: number }`],
+)
 
-  Dieser Abschnitt im Template ist der richtige Ort für die konsistente Behandlung solcher Themen.
+== Summary-Caching (Denormalisierung)
 
-  Viele solche Konzepte beeinflussen oder beziehen sich auf mehrerer Ihrer Bausteine.
+Die Summary ist die einzige serverseitig vorgehaltene Statistik. Sie wird in dem
+Tracker-Dokument mitgeführt und bei *jeder* Event-Änderung (Anlegen, Löschen) per
+Voll-Aggregation über die Events des Trackers neu berechnet und gespeichert.
 
-  *Form*
+- *Voll-Aggregation statt inkrementeller Update*: robust gegen Daten, die ausserhalb
+  des Anwendungspaths entstehen (z. B. manuelle DB-Korrekturen); Aufwand ist bei
+  Single-User-Grösse vernachlässigbar.
+- *Keine Transaktion* zwischen Event-Write und Summary-Update: im Fehlerfall
+  inkonsistent, heilt sich aber bei der nächsten Änderung (Abschnitt 11).
 
-  Kann vielfältig sein:
+== Validierung
 
-  - Konzeptpapiere mit beliebiger Gliederung,
-  - beispielhafte Implementierung speziell für technische Konzepte,
-  - übergreifende Modelle/Szenarien mit Notationen, die Sie auch in den Architektursichten nutzen.
+Validierung erfolgt an beiden Enden:
 
-  *Struktur*
+- *Backend (autoritativ)*: globaler `ValidationPipe` (`whitelist: true`) mit
+  class-validator-DTOs an jedem Endpunkt; zusätzlich validiert der `EventController`
+  die typabhängigen Event-Daten gegen den konkreten Tracker-Typ.
+- *Frontend (komfort)*: Reactive Forms mit eigenen Validatoren (z. B.
+  `requiredTrimmed`), ungültige Formulare werden nicht abgeschickt.
 
-  Wählen Sie *nur* die wichtigsten Themen für Ihr System und erklären das jeweilige Konzept dann unter einer Level-2 Überschrift dieser Sektion (z.B. 8.1, 8.2 etc).
+```mermaid
+flowchart LR
+  R["HTTP-Request"] --> V1["ValidationPipe (DTO, whitelist)"]
+  V1 --> V2{"Event-Data?"}
+  V2 -- ja --> V3["Typ-Validierung\n(CounterEventDto / CategoryEventDto)"]
+  V2 -- nein --> S["Service"]
+  V3 --> S
+  V1 -. "Fehler" .-> E400["400 Bad Request"]
+  V3 -. "Fehler" .-> E400
+```
 
-  Beschränken Sie sich auf die wichtigen, und versuchen *auf keinen Fall* alle oben dargestellten Themen zu bearbeiten.
+== Testing-Strategie
 
-  _Weiterführende Informationen:_ Siehe #link("https://docs.arc42.org/section-8/")[Querschnittliche Konzepte] in der online-Dokumentation (auf Englisch).
-]
+#table(
+  columns: (0.7fr, 2fr, 2.2fr, 0.8fr),
+  table.header[*Ebene*][*Gegenstand*][*Tooling*][*Ort*],
+  [Unit], [Frontend-Components, Services, `stats.util`], [Vitest + jsdom], [`frontend/`],
+  [API],
+  [REST-Endpunkte (CRUD Tracker, Events, Validierung, Summary)],
+  [Vitest + supertest + mongodb-memory-server],
+  [`backend/test/`],
 
-== _\<Konzept 1>_
+  [E2E], [User Journeys über die UI am kompletten Stack], [Cypress (Chromium) + Docker Compose], [`e2e/`],
+)
 
-_\<Erklärung>_
+Details: ADR 8. Die API-Tests nutzen einen echten MongoDB-Driver gegen eine
+in-Memory-Instanz, d. h. ohne Mocks; die E2E-Tests fahren dafür exakt denselben
+Docker-Stack hoch wie die Produktion.
 
-== _\<Konzept 2>_
+== CI/CD (GitHub Actions)
 
-_\<Erklärung>_
-
-== _\<Konzept n>_
-
-_\<Erklärung>_
-// end::DE[]
+```mermaid
+flowchart LR
+  PM["Push → main"] --> FJ["Job frontend\npnpm build + Vitest"]
+  PM --> BJ["Job backend\npnpm build + API-Tests (in-Memory-Mongo)"]
+  FJ --> EJ["Job e2e-test\nCypress + Docker-Stack"]
+  BJ --> EJ
+  PD["Push → docs/**"] --> TJ["Job docs\nTypst compile → PDF"]
+  TJ --> REL["GitHub Release (Tag: latest)"]
+```
