@@ -25,4 +25,5 @@
 | 13. Sept  | 3h      | Überarbeitung/vereinheitlichung der statistik ansichten                                       |
 | 14. Sept  | 0.5h    | Einfache vorschläge von Kategorien in Event fomular mit DataList implementiert                |
 | 14. Sept  | 1.5h    | Validation im Backend mit class-validator implementiert                                       |
-| **Total** | 62.0h   |                                                                                               |
+| 14. Sept  | 3h      | E2E Test mit Cypress erstellt                                                                 |
+| **Total** | 65.0h   |                                                                                               |

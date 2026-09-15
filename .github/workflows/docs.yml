@@ -6,6 +6,10 @@ on:
       - main
     paths:
       - "docs/**"
+      - ".github/workflows/docs.yml"
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -13,10 +17,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup Typst
-        uses: typst-community/setup-typst@v4
+        uses: typst-community/setup-typst@v5
 
       - name: Build PDF
         run: typst compile docs/weblab-documentation.typ weblab-documentation.pdf
@@ -26,3 +30,13 @@ jobs:
         with:
           name: weblab-documentation
           path: weblab-documentation.pdf
+
+      - name: Publish documentation
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: latest
+          name: Latest documentation
+          files: weblab-documentation.pdf
+          overwrite_files: true
+          prerelease: false
+          make_latest: true

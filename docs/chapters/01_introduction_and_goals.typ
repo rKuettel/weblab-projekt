@@ -1,7 +1,6 @@
 // tag::DE[]
 #import "../lib.typ": arc42help
 = Einführung und Ziele <section-introduction-and-goals>
-test
 
 #arc42help[
   Beschreibt die wesentlichen Anforderungen und treibenden Kräfte, die bei der Umsetzung der Softwarearchitektur und Entwicklung des Systems berücksichtigt werden müssen.
