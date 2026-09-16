@@ -1,12 +1,10 @@
 import type { EChartsCoreOption } from 'echarts/core';
 import { NgxEchartsDirective, provideEchartsCore } from 'ngx-echarts';
 import * as echarts from 'echarts/core';
-import { BarChart, HeatmapChart } from 'echarts/charts';
+import { HeatmapChart } from 'echarts/charts';
 import {
   GridComponent,
   TooltipComponent,
-  LegendComponent,
-  TitleComponent,
   VisualMapComponent,
   CalendarComponent,
 } from 'echarts/components';
@@ -15,12 +13,9 @@ import { Component, computed, inject, input } from '@angular/core';
 import { DateRange } from '../../date-range-selector/date-range-selector.component';
 import { ThemeService } from '../../../services/theme.service';
 echarts.use([
-  BarChart,
   GridComponent,
   SVGRenderer,
   TooltipComponent,
-  LegendComponent,
-  TitleComponent,
   VisualMapComponent,
   CalendarComponent,
   HeatmapChart,

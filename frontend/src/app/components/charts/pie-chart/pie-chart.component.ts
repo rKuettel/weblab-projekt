@@ -2,24 +2,12 @@ import { Component, computed, inject, input } from '@angular/core';
 import { NgxEchartsDirective, provideEchartsCore } from 'ngx-echarts';
 import * as echarts from 'echarts/core';
 import { PieChart } from 'echarts/charts';
-import {
-  GridComponent,
-  TooltipComponent,
-  LegendComponent,
-  DatasetComponent,
-} from 'echarts/components';
+import { TooltipComponent, LegendComponent, DatasetComponent } from 'echarts/components';
 import { SVGRenderer } from 'echarts/renderers';
 import { ThemeService } from '../../../services/theme.service';
 import { ChartsData } from '../chart-data.type';
 import { EChartsOption } from 'echarts';
-echarts.use([
-  PieChart,
-  DatasetComponent,
-  GridComponent,
-  SVGRenderer,
-  TooltipComponent,
-  LegendComponent,
-]);
+echarts.use([PieChart, DatasetComponent, SVGRenderer, TooltipComponent, LegendComponent]);
 
 @Component({
   imports: [NgxEchartsDirective],
@@ -58,6 +46,7 @@ export class PieChartComponent {
       legend: {
         align: 'left',
       },
+
       series: {
         type: 'pie',
         radius: '60%',

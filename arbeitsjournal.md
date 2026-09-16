@@ -27,4 +27,5 @@
 | 14. Sept  | 1.5h    | Validation im Backend mit class-validator implementiert                                       |
 | 14. Sept  | 3h      | E2E Test mit Cypress erstellt                                                                 |
 | 15. Sept  | 3h      | Erster teil der Architektur Dokumentation nachgeführt                                         |
+| 16. Sept  | 2h      | Lighthouse Score verbessern                                                                   |
 | **Total** | 68.0h   |                                                                                               |

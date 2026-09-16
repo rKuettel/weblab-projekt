@@ -13,19 +13,6 @@ export type Tracker<T extends TrackerType = TrackerType> = {
   };
 }[T];
 
-// export type Tracker<T extends TrackerType = TrackerType> = {
-//   id: string;
-//   name: string;
-//   type: T;
-//   summary: SummaryFor<T>;
-// };
-// export interface Tracker {
-//   id: string;
-//   name: string;
-//   type: TrackerType;
-//   summary: TrackerSummary;
-// }
-
 export type CreateTracker<T extends TrackerType = TrackerType> = Omit<Tracker<T>, 'id' | 'summary'>;
 
 export const TRACKER_TYPES = {

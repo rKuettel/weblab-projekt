@@ -2,24 +2,12 @@ import { Component, computed, inject, input } from '@angular/core';
 import { NgxEchartsDirective, provideEchartsCore } from 'ngx-echarts';
 import * as echarts from 'echarts/core';
 import { BarChart } from 'echarts/charts';
-import {
-  GridComponent,
-  TooltipComponent,
-  LegendComponent,
-  DatasetComponent,
-} from 'echarts/components';
+import { GridComponent, TooltipComponent, DatasetComponent } from 'echarts/components';
 import { SVGRenderer } from 'echarts/renderers';
 import { ThemeService } from '../../../services/theme.service';
 import { ChartsData } from '../chart-data.type';
 import { EChartsOption, SeriesOption } from 'echarts';
-echarts.use([
-  BarChart,
-  DatasetComponent,
-  GridComponent,
-  SVGRenderer,
-  TooltipComponent,
-  LegendComponent,
-]);
+echarts.use([BarChart, DatasetComponent, GridComponent, SVGRenderer, TooltipComponent]);
 
 @Component({
   imports: [NgxEchartsDirective],

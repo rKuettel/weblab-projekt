@@ -13,6 +13,7 @@ RUN pnpm run -F track-thing-api build \
   && pnpm deploy -F track-thing-api --prod prod
 
 FROM node:alpine
+ENV NODE_ENV=production
 WORKDIR /opt/app
 COPY --from=builder /app/prod/node_modules ./node_modules
 COPY --from=builder /app/backend/dist ./dist

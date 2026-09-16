@@ -33,7 +33,9 @@ import { generateEventPerDay, groupBy, groupByDate, sumBy } from '../stats.util'
   template: `
     <article>
       <h3>{{ 'tracker.stats.category.pie' | translate }}</h3>
-      <app-pie-chart [data]="pieChartData()"></app-pie-chart>
+      @defer {
+        <app-pie-chart [data]="pieChartData()"></app-pie-chart>
+      }
     </article>
     <article>
       <h3>{{ 'tracker.stats.category.total' | translate }}</h3>
@@ -42,7 +44,9 @@ import { generateEventPerDay, groupBy, groupByDate, sumBy } from '../stats.util'
 
     <article class="wide-card">
       <h3>{{ 'tracker.stats.category.barChart' | translate }}</h3>
-      <app-bar-chart [data]="this.barChartData()"> ></app-bar-chart>
+      @defer {
+        <app-bar-chart [data]="this.barChartData()"> ></app-bar-chart>
+      }
     </article>
   `,
 })

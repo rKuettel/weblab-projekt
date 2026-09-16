@@ -1,5 +1,4 @@
 import { Route } from '@angular/router';
-import { PATHS } from './paths.config';
 import { TrackerDashboardComponent } from '../features/trackers/smart/tracker-dashboard/tracker-dashboard.component';
 import { TrackerDetailComponent } from '../features/trackers/smart/tracker-detail/tracker-detail.component';
 

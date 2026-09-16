@@ -1,4 +1,4 @@
-import { Component, computed, DOCUMENT, inject, signal } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { ThemeService } from '../../services/theme.service';
 
 @Component({

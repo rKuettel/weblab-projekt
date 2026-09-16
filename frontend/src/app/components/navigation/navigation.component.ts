@@ -1,4 +1,4 @@
-import { Component, input, ChangeDetectionStrategy } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { NavigationItem } from './navigation.type';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -34,7 +34,6 @@ import { ThemeSwitcherComponent } from '../theme-switcher/theme-switcher.compone
       </ul>
     </nav>
   `,
-  changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class NavigationComponent {
   title = 'app.title';

@@ -40,14 +40,18 @@ const MS_PER_DAY = 86_400_000;
     </article>
     <article class="wide-card">
       <h3>{{ 'tracker.stats.counter.heatmap' | translate }}</h3>
-      <app-calendar-heatmap [data]="this.heatMapData()" [dateRange]="this.dateRange()">
-        ></app-calendar-heatmap
-      >
+      @defer {
+        <app-calendar-heatmap [data]="this.heatMapData()" [dateRange]="this.dateRange()">
+          ></app-calendar-heatmap
+        >
+      }
     </article>
 
     <article class="wide-card">
       <h3>{{ 'tracker.stats.counter.barChart' | translate }}</h3>
-      <app-bar-chart [data]="this.barChartData()"> ></app-bar-chart>
+      @defer {
+        <app-bar-chart [data]="this.barChartData()"> ></app-bar-chart>
+      }
     </article>
   `,
 })
