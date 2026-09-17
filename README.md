@@ -3,7 +3,7 @@
 Repo für das Abschlussprojekt des Moduls Web Programming Lab
 
 - [Projekt-Vorschlag](./projekt-vorschlag.md)
-- [Documentation](https://github.com/rKuettel/weblab-projekt/releases/download/latest/weblab-documentation.pdf)
+- [Architektur Dokumentation](https://github.com/rKuettel/weblab-projekt/releases/download/latest/weblab-documentation.pdf)
 - [Arbeitsjournal](./arbeitsjournal.md)
 - [Fazit & Reflexion](./fazit.md)
 
@@ -11,7 +11,7 @@ Repo für das Abschlussprojekt des Moduls Web Programming Lab
 
 ### Docker Compose
 
-Im root des Repos gibt es ein `docker-compose.yaml` mit der Komplete Stack bestehend aus Frontend/Backend und MongoDB mit einem Befehl gestartet werden kann:
+Im root des Repos gibt es ein `docker-compose.yaml` mit dem der komplete Stack bestehend aus Frontend/Backend und MongoDB mit einem Befehl gestartet werden kann:
 
 ```bash
 docker compose up --build -d
