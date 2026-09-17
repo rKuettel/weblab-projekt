@@ -7,7 +7,7 @@ services:
     ports:
       - "27017:27017"
 
-  moguku:
+  mongoku:
     image: huggingface/mongoku
     environment:
       MONGOKU_DEFAULT_HOST: "mongodb://${MONGODB_USER}:${MONGODB_PASS}@mongo"

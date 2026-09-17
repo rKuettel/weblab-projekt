@@ -1,85 +1,42 @@
-// tag::DE[]
-#import "../lib.typ": arc42help
 = Qualitätsanforderungen <section-quality-scenarios>
-
-#arc42help[
-  *Inhalt*
-
-  Dieser Abschnitt enthält alle relevanten Qualitätsanforderungen.
-
-  Die wichtigsten davon haben Sie bereits in Abschnitt 1.2 (Qualitätsziele) hervorgehoben, daher soll hier nur auf sie verwiesen werden.
-  In diesem Abschnitt 10 sollten Sie auch Qualitätsanforderungen mit geringerer Bedeutung erfassen, deren Nichterfüllung keine großen Risiken birgt (die aber _nice-to-have_ sein könnten).
-
-  *Motivation*
-
-  Weil Qualitätsanforderungen die Architekturentscheidungen oft maßgeblich beeinflussen, sollten Sie die für Ihre Stakeholder relevanten Qualitätsanforderungen kennen, möglichst konkret und operationalisiert.
-
-  _Weiterführende Informationen:_
-
-  - Siehe #link("https://docs.arc42.org/section-10/")[Qualitätsanforderungen] in der online-Dokumentation (auf Englisch!).
-  - Siehe auch das ausführliche #link("https://quality.arc42.org")[Q42 Qualitätsmodell auf https:\/\/quality.arc42.org].
-]
 
 == Übersicht der Qualitätsanforderungen
 
-#arc42help[
-  *Inhalt*
+Ergänzend zu den in Abschnitt 1.2 definierten Qualitätszielen werden in diesem
+Kapitel weitere Qualitätsanforderungen mit geringerer Priorität definiert:
 
-  Eine Übersicht oder Zusammenfassung der Qualitätsanforderungen.
+#table(
+  columns: (1.2fr, 3fr),
+  table.header[*Kategorie*][*Qualitätsmerkmal*],
+  [Verfügbarkeit],
+  [Ereignis-Erfassung auch ohne Internetverbindung möglich (z. B. PWA) – *vorgesehen, in der ersten Version nicht umgesetzt* (QS-1).],
 
-  *Motivation*
+  [Benutzbarkeit],
+  [Responsives Design: alle Funktionen ohne horizontales Scrollen auf Desktop, Tablet und Smartphone nutzbar (QS-2).],
 
-  Oft stößt man auf Dutzende (oder sogar Hunderte) von detaillierten Qualitätsanforderungen für ein System.
-  In diesem Abschnitt sollten Sie versuchen, sie zusammenzufassen, z. B. durch die Beschreibung von Kategorien oder Themen (wie z.B. von #link("https://www.iso.org/obp/ui/#iso:std:iso-iec:25010:ed-2:v1:en")[ISO 25010:2023] oder #link("https://quality.arc42.org")[Q42] vorgeschlagen).
-
-  Wenn diese Kurzbeschreibungen oder Zusammenfassungen bereits präzise, spezifisch und messbar sind, können Sie Abschnitt 10.2 auslassen.
-
-  *Form*
-
-  Verwenden Sie eine einfache Tabelle, in der jede Zeile eine Kategorie oder ein Thema und eine kurze Beschreibung der Qualitätsanforderung enthält.
-  Alternativ können Sie auch eine Mindmap verwenden, um diese Qualitätsanforderungen zu strukturieren.
-  In der Literatur (insb. \[Bass+21\]) ist die Idee eines _Quality Attribute Utility Tree_ (auf Deutsch manchmal kurz als _Qualitätsbaum_ bezeichnet) beschrieben worden, der den Oberbegriff „Qualität" als Wurzel hat und eine baumartige Verfeinerung des Begriffs „Qualität" verwendet.
-]
+  [Einfache Nutzung],
+  [Tracker anlegen und Ereignisse erfassen in wenigen Klicks; Dashboard als zentrale Übersicht (QS-3).],
+)
 
 == Qualitätsszenarien
 
-#arc42help[
-  *Inhalt*
+Kurze Form (Kontext / Stimulus / Reaktion / Metrik):
 
-  Qualitätsszenarien konkretisieren Qualitätsanforderungen und ermöglichen es zu entscheiden, ob sie erfüllt sind (im Sinne von Akzeptanzkriterien).
-  Stellen Sie sicher, dass Ihre Szenarien spezifisch und messbar sind.
+#table(
+  columns: (0.5fr, 1.8fr, 1.8fr, 1.7fr),
+  table.header[*ID*][*Stimulus (Quelle, Anstoss)*][*Reaktion des Systems*][*Metrik / Akzeptanz*],
+  [QS-1],
+  [Benutzer ist offline und will ein Ereignis erfassen (Verfügbarkeit)],
+  [Die Applikation erlaubt die Erfassung; Synchronisation bei Rückkehr der Verbindung],
+  [Es gehen keine Daten verloren, sollte der Nutzer die Applikation ohne Internetverbindung benutzen],
 
-  Zwei Arten von Szenarien finden wir besonders nützlich:
+  [QS-2],
+  [Benutzer öffnet die Applikation auf einem Smartphone oder Tablet (Benutzbarkeit)],
+  [Alle Funktionen ohne horizontales Scrollen nutzbar; Layout passt sich an das Gerät an],
+  [Responsives Layout über alle Seiten; keine desktop-gebundene Funktionalität],
 
-  - _Nutzungsszenarien_ (auch bekannt als Anwendungs- oder Anwendungsfallszenarien) beschreiben, wie das System zur Laufzeit auf einen bestimmten Auslöser reagieren soll.
-    Hierunter fallen auch Szenarien zur Beschreibung von Effizienz oder Performance.
-    Beispiel: Das System beantwortet eine Benutzeranfrage innerhalb einer Sekunde.
-  - _Änderungsszenarien_ beschreiben die gewünschte Wirkung einer Änderung oder Erweiterung des Systems oder seiner unmittelbaren Umgebung.
-    Beispiel: Zusätzliche Funktionalität wird implementiert oder Anforderungen an ein Qualitätsmerkmal ändern sich, und der Aufwand oder die Dauer der Änderung wird gemessen.
-
-  *Form*
-
-  Typische Informationen für detaillierte Szenarien sind die folgenden:
-
-  In Kurzform (bevorzugt im Q42-Modell):
-
-  - *Kontext/Hintergrund*: Um welche Art von System oder Komponente handelt es sich, wie sieht die Umgebung oder Situation aus?
-  - *Quelle/Stimulus*: Wer oder was initiiert oder löst ein Verhalten, eine Reaktion oder eine Aktion aus.
-  - *Metrik/Akzeptanzkriterien*: Eine Reaktion einschließlich einer _Maßnahme_ oder _Metrik_
-
-  Die Langform von Szenarien (die von der SEI und \[Bass+21\] bevorzugt wird) ist detaillierter und enthält die folgenden Informationen:
-
-  - *Szenario-ID*: Ein eindeutiger Bezeichner für das Szenario.
-  - *Szenario-Name*: Ein kurzer, beschreibender Name für das Szenario.
-  - *Quelle*: Die Entität (Benutzer, System oder Ereignis), die das Szenario auslöst.
-  - *Stimulus*: Das auslösende Ereignis oder die Bedingung, auf die das System reagieren muss.
-  - *Umgebung*: Der betriebliche Kontext oder die Bedingungen, unter denen das System den Stimulus erlebt.
-  - *Artefakt*: Die Bausteine oder anderen Elemente des Systems, die von dem Stimulus betroffen sind.
-  - *Reaktion*: Das Ergebnis oder Verhalten, das das System als Reaktion auf den Stimulus zeigt.
-  - *Antwortmaß*: Das Kriterium oder die Metrik, nach der die Antwort des Systems bewertet wird.
-
-  _Beispiele:_ Ausführliche Beispiele für Qualitätsanforderungen finden Sie auf #link("https://quality.arc42.org")[der Website zum Qualitätsmodell Q42].
-
-  _Weitere Informationen:_ Len Bass, Paul Clements, Rick Kazman: „Software Architecture in Practice", 4. Auflage, Addison-Wesley, 2021.
-]
-// end::DE[]
+  [QS-3],
+  [Benutzer will auf dem Dashboard einen neuen Tracker anlegen oder ein Ereignis erfassen (Einfache Nutzung)],
+  [Das System erlaubt dem Nutzer, Ereignisse überall zu erfassen],
+  [≤ 3 Interaktionen, bis das Ereignis erfasst und sichtbar ist],
+)

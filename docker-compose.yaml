@@ -1,16 +1,18 @@
 services:
   backend:
+    container_name: track-thing-backend
     build:
       context: .
       dockerfile: backend/Dockerfile
     environment:
-      MONGODB_USER: ${MONGODB_USER}
-      MONGODB_PASS: ${MONGODB_PASS}
+      MONGODB_USER: ${MONGODB_USER:-admin}
+      MONGODB_PASS: ${MONGODB_PASS:-password}
       MONGODB_URI: "mongodb://mongo"
     depends_on:
       - mongo
 
   frontend:
+    container_name: track-thing-frontend
     build:
       context: .
       dockerfile: frontend/Dockerfile
@@ -20,7 +22,8 @@ services:
       - backend
 
   mongo:
+    container_name: track-thing-db
     image: mongo:7
     environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGODB_USER}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_PASS}
+      MONGO_INITDB_ROOT_USERNAME: ${MONGODB_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_PASS:-password}

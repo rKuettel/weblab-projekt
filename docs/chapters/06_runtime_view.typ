@@ -1,12 +1,14 @@
+#import "@preview/merman:0.3.0": mermaid
 = Laufzeitsicht <section-runtime-view>
 
 == Szenario: Dashboard laden
 
-Das Dashboard zeigt alle Tracker mit ihrer  `summary` an . Es werden nur die
+Das Dashboard zeigt alle Tracker mit ihrer `summary` an. Es werden nur die
 Tracker-Dokumente geladen, es findet keine Event-Aggregation statt.
 Pro Tracker wird auf dem UI eine Karte angezeigt.
 
-```mermaid
+#mermaid(
+  "
 sequenceDiagram
     participant B as Browser (Angular-SPA)
     participant C as Tracker Controller
@@ -18,14 +20,17 @@ sequenceDiagram
     M-->>S: Tracker-Dokumente
     S-->>C: Tracker-Dokumente
     C-->>B: 200 TrackerDto[]
-```
+",
+  width: 100%,
+)
 
 == Szenario: Ereignis erfassen
 
 Die Summary wird mit der Event-Erfassung neu berechnet und zusammen mit dem
 aktuellen Tracker zurückgegeben.  Das Frontend muss dafür keine zweite Anfrage stellen.
 
-```mermaid
+#mermaid(
+  "
 sequenceDiagram
     participant B as Browser
     participant EC as EventController
@@ -39,14 +44,19 @@ sequenceDiagram
     ES->>M: tracker.summary mit neuem Wert aktualisieren
     ES-->>EC: aktualisierter Tracker
     EC-->>B: 200 TrackerDto (aktualisierte Summary)
-```
+",
+  width: 100%,
+)
+
+#pagebreak()
 == Szenario: Statistiken anzeigen
 
 Detaillierte Statistiken werden clientseitig berechnet (ADR 6): Das Frontend lädt die
 Events im gewählten Datumsbereich und leitet daraus Charts und Kennzahlen ab
 (`stats.util`: Gruppierung nach Tag/Kategorie, Summation, Lückenbefüllung).
 
-```mermaid
+#mermaid(
+  "
 sequenceDiagram
     participant B as Browser
     participant C as tracker-detail
@@ -60,15 +70,18 @@ sequenceDiagram
     M-->>ES: Event-Dokumente
     ES-->>A: Event-Dokumente
     A-->>C: TrackerEventDto[]
-    C->>C: Berechnung von Statiskigen mittels `stats.util`
+    C->>C: Berechnung von Statistiken mittels `stats.util`
     C-->>B: Charts (ECharts) + Kennzahlen rendern
-```
+",
+  width: 100%,
+)
 
 == Szenario: Tracker löschen
 
-Das Löschen eines Trackers kaskadiert auf dessen Events (anwendungsseitig, ADR 5).
+Das Löschen eines Trackers kaskadiert auf dessen Events (anwendungsseitig, ADR 4).
 
-```mermaid
+#mermaid(
+  "
 sequenceDiagram
     participant B as Browser
     participant TC as TrackerController
@@ -80,7 +93,9 @@ sequenceDiagram
     TS->>M: deleteMany Events mit trackerId
     TS-->>TC: ok
     TC-->>B: 200
-```
+",
+  width: 100%,
+)
 
 == Fehler- und Ausnahmeszenarien
 
@@ -91,6 +106,5 @@ sequenceDiagram
   [Event-Daten passen nicht zum Tracker-Typ (z. B. `category` bei Counter)],
   [`BadRequestException` → HTTP 400 mit Fehlermeldung],
 
-  [Ungültige Tracker-/Event-Daten (z. B. fehlendes `name`, negatives Delta)],
-  [Globaler `ValidationPipe` (class-validator) → HTTP 400],
+  [Ungültige Tracker-/Event-Daten (z. B. fehlendes `name`)], [Globaler `ValidationPipe` (class-validator) → HTTP 400],
 )

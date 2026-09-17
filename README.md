@@ -3,11 +3,23 @@
 Repo für das Abschlussprojekt des Moduls Web Programming Lab
 
 - [Projekt-Vorschlag](./projekt-vorschlag.md)
-  [Documentation](../../actions/workflows/docs.yml)
+- [Documentation](https://github.com/rKuettel/weblab-projekt/releases/download/latest/weblab-documentation.pdf)
+- [Arbeitsjournal](./arbeitsjournal.md)
+- [Fazit & Reflexion](./fazit.md)
 
 ## Running Locally
 
-Create a `.env` file in the root of the repo, and set the following variables:
+### Docker Compose
+
+Im root des Repos gibt es ein `docker-compose.yaml` mit der Komplete Stack bestehend aus Frontend/Backend und MongoDB mit einem Befehl gestartet werden kann:
+
+```bash
+docker compose up --build -d
+```
+
+### Development
+
+Erstelle ein `.env` file im root des repos, und setze folgende Variablen:
 
 ```.env
 MONGODB_USER=<USER>
@@ -15,24 +27,22 @@ MONGODB_PASS=<PASSWORD>
 MONGODB_URI=mongodb://localhost
 ```
 
-### Development
-
-For development first mongoDB needs to be started. Use the dedicated `docker-compose.develop.yaml` for this:
+Für die Entwicklung muss zuerst eine mongoDB Instanz gestartet werden.
+Dafür kann das `docker-compose.develop.yaml` verwendet werden:
 
 ```bash
 docker compose -f docker-compose.develop.yaml up -d
 ```
 
-After mongoDB has been started the backend and frontend can be started in development mode by running the following command in the root of the repo:
+Nachdem mongoDB gestartet wrude kann auch das frontend und backend im Enwticklungsmodus gestartet werden.
+Führe dazu foglenden Command im root des repos aus:
 
 ```bash
 pnpm start
 ```
 
-### Docker Compose
+## End-to-End Tests
 
-There is `docker-compose.yaml` which builds an image for both front-/bakend and also spinns up mongodb.
+Es existieren E2E Test welche den ganzen Stack zusammen testen.
 
-```bash
-docker compose up --build -d
-```
+Weitere infos dazu in [e2e/README.md](/e2e/README.md)

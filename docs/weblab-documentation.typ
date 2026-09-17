@@ -10,15 +10,15 @@
 // ============================================================
 
 #set document(
-  title: "Track Thing – arc42 Dokumentation",
-  author: "Web Programming Lab, Hochschule Luzern",
+  title: "Track Thing – Architektur Dokumentation",
+  author: "Roman Küttel",
 )
 
 #set text(lang: "de", region: "ch", font: "Libertinus Serif", size: 11pt)
 #set heading(numbering: "1.1")
 #set par(justify: true)
 
-#show raw.where(lang: "mermaid"): show-mermaid-blocks(width: 100%)
+// #show raw.where(lang: "mermaid"): show-mermaid-blocks(width: 100%, presentation-profile: "merman-modern")
 
 // ============================================================
 // Title page
@@ -30,8 +30,9 @@
   #text(size: 24pt, weight: "bold")[Track Thing]
   #v(0.5em)
   #text(size: 14pt)[Tracking-/Statistik-Applikation \
-    arc42 Dokumentation \
-    Web Programming Lab, Hochschule Luzern]
+    Architektur Dokumentation \
+    Roman Küttel
+  ]
 ]
 
 #v(2em)
