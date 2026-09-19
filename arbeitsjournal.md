@@ -29,4 +29,5 @@
 | 15. Sept  | 3h      | Erster Teil der Architektur Dokumentation nachgeführt                                        |
 | 16. Sept  | 2h      | Lighthouse Score verbessern                                                                  |
 | 17. Sept  | 3h      | Fertigstellung Doku und andere Aufräumarbeiten                                               |
-| **Total** | 72.0h   |                                                                                              |
+| 19. Sept  | 0.5h    | Letztes mal durchschauen + Abgabe                                                            |
+| **Total** | 72.5h   |                                                                                              |
